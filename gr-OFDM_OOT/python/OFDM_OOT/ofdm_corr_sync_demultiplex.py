@@ -30,7 +30,13 @@ class ofdm_corr_sync_demultiplex(gr.basic_block):
         # the required number of input items is returned
         #   in a list where each element represents the
         #   number of required items for each input
-        ninput_items_required = [noutput_items*self.nfft] * ninputs
+
+        ninput_items_required = [noutput_items*self.nfft + 1] * ninputs
+
+        # debug purposes
+        # print("ofdm_corr_sync_demultiplex.forecast(noutput_items={}, ninputs={})->ninput_items_required={}".format(
+        #     noutput_items, ninputs, ninput_items_required), flush=True)
+
         return ninput_items_required
 
     def general_work(self, input_items, output_items):
@@ -38,7 +44,7 @@ class ofdm_corr_sync_demultiplex(gr.basic_block):
         ninput_items = len(input_items[0])
         noutput_items = len(output_items[0])
 
-        tags = self.get_tags_in_window(0, 0, ninput_items-self.nfft+1)
+        tags = self.get_tags_in_window(0, 0, ninput_items-self.nfft)
 
         items_processed = 0
         input_consumed = 0
@@ -54,10 +60,22 @@ class ofdm_corr_sync_demultiplex(gr.basic_block):
             freq_offset = pmt.to_python(tag.value)
             output_items[0][items_processed] = np.fft.fft( vec*np.exp(-1j*(2*np.pi)*freq_offset*np.arange(self.nfft)) )
 
-            input_consumed = tag_rel_offset + 1
+            input_consumed = max(input_consumed, tag_rel_offset + 1)
 
             items_processed += 1
 
-        self.consume_each(input_consumed)
+
+        # debug purposes
+        # print("ofdm_corr_sync_demultiplex.general_work("
+        #         "noutput_items={},"
+        #         "ninput_items={})->"
+        #         "(items_processed={}, input_consumed={}".format(
+        #     noutput_items, ninput_items, items_processed, input_consumed), flush=True)
+
+        # if no tags just consume input otherwise program will hang
+        if len(tags) == 0:
+            self.consume_each(ninput_items)
+        else:
+            self.consume_each(input_consumed)
         return items_processed
 
