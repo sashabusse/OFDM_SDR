@@ -94,7 +94,48 @@ class flowgraph(gr.top_block, Qt.QWidget):
         ##################################################
         self._carrier_freq_range = Range(int(1.8e9), int(2.2e9), int(0.001e9), int(2.050e9), 200)
         self._carrier_freq_win = RangeWidget(self._carrier_freq_range, self.set_carrier_freq, "carrier_freq", "counter_slider", int, QtCore.Qt.Horizontal)
-        self.top_layout.addWidget(self._carrier_freq_win)
+        self.top_grid_layout.addWidget(self._carrier_freq_win, 0, 0, 1, 1)
+        for r in range(0, 1):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
+        self.snr_est = qtgui.number_sink(
+            gr.sizeof_float,
+            1,
+            qtgui.NUM_GRAPH_NONE,
+            1,
+            None # parent
+        )
+        self.snr_est.set_update_time(0.10)
+        self.snr_est.set_title("SNR est")
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        units = ['', '', '', '', '',
+            '', '', '', '', '']
+        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
+            ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
+        factor = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+
+        for i in range(1):
+            self.snr_est.set_min(i, 0)
+            self.snr_est.set_max(i, 3)
+            self.snr_est.set_color(i, colors[i][0], colors[i][1])
+            if len(labels[i]) == 0:
+                self.snr_est.set_label(i, "Data {0}".format(i))
+            else:
+                self.snr_est.set_label(i, labels[i])
+            self.snr_est.set_unit(i, units[i])
+            self.snr_est.set_factor(i, factor[i])
+
+        self.snr_est.enable_autoscale(False)
+        self._snr_est_win = sip.wrapinstance(self.snr_est.qwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._snr_est_win, 1, 0, 1, 1)
+        for r in range(1, 2):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_vector_sink_f_0 = qtgui.vector_sink_f(
             1024,
             0,
@@ -106,7 +147,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
             None # parent
         )
         self.qtgui_vector_sink_f_0.set_update_time(0.10)
-        self.qtgui_vector_sink_f_0.set_y_axis(0, 20)
+        self.qtgui_vector_sink_f_0.set_y_axis(0, 5)
         self.qtgui_vector_sink_f_0.enable_autoscale(False)
         self.qtgui_vector_sink_f_0.enable_grid(True)
         self.qtgui_vector_sink_f_0.set_x_axis_units("")
@@ -132,55 +173,11 @@ class flowgraph(gr.top_block, Qt.QWidget):
             self.qtgui_vector_sink_f_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_vector_sink_f_0_win = sip.wrapinstance(self.qtgui_vector_sink_f_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_vector_sink_f_0_win)
-        self.qtgui_time_sink_x_1 = qtgui.time_sink_f(
-            100, #size
-            samp_rate, #samp_rate
-            "", #name
-            1, #number of inputs
-            None # parent
-        )
-        self.qtgui_time_sink_x_1.set_update_time(0.10)
-        self.qtgui_time_sink_x_1.set_y_axis(-1, 1)
-
-        self.qtgui_time_sink_x_1.set_y_label('Amplitude', "")
-
-        self.qtgui_time_sink_x_1.enable_tags(True)
-        self.qtgui_time_sink_x_1.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
-        self.qtgui_time_sink_x_1.enable_autoscale(True)
-        self.qtgui_time_sink_x_1.enable_grid(True)
-        self.qtgui_time_sink_x_1.enable_axis_labels(True)
-        self.qtgui_time_sink_x_1.enable_control_panel(True)
-        self.qtgui_time_sink_x_1.enable_stem_plot(False)
-
-
-        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
-            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
-        widths = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        colors = ['blue', 'red', 'green', 'black', 'cyan',
-            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0]
-        styles = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        markers = [-1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1]
-
-
-        for i in range(1):
-            if len(labels[i]) == 0:
-                self.qtgui_time_sink_x_1.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_time_sink_x_1.set_line_label(i, labels[i])
-            self.qtgui_time_sink_x_1.set_line_width(i, widths[i])
-            self.qtgui_time_sink_x_1.set_line_color(i, colors[i])
-            self.qtgui_time_sink_x_1.set_line_style(i, styles[i])
-            self.qtgui_time_sink_x_1.set_line_marker(i, markers[i])
-            self.qtgui_time_sink_x_1.set_line_alpha(i, alphas[i])
-
-        self._qtgui_time_sink_x_1_win = sip.wrapinstance(self.qtgui_time_sink_x_1.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_1_win)
+        self.top_grid_layout.addWidget(self._qtgui_vector_sink_f_0_win, 2, 1, 1, 1)
+        for r in range(2, 3):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(1, 2):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
             4096, #size
             1, #samp_rate
@@ -194,7 +191,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.set_y_label('Amplitude', "")
 
         self.qtgui_time_sink_x_0.enable_tags(True)
-        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_TAG, qtgui.TRIG_SLOPE_POS, 0.8, 0, 0, "packet_len")
+        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_AUTO, qtgui.TRIG_SLOPE_POS, 0.8, 0, 0, "packet_len")
         self.qtgui_time_sink_x_0.enable_autoscale(False)
         self.qtgui_time_sink_x_0.enable_grid(True)
         self.qtgui_time_sink_x_0.enable_axis_labels(True)
@@ -228,7 +225,11 @@ class flowgraph(gr.top_block, Qt.QWidget):
             self.qtgui_time_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_time_sink_x_0_win, 3, 0, 1, 2)
+        for r in range(3, 4):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 2):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
             4096, #size
             window.WIN_BLACKMAN_hARRIS, #wintype
@@ -270,7 +271,11 @@ class flowgraph(gr.top_block, Qt.QWidget):
             self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_win, 2, 0, 1, 1)
+        for r in range(2, 3):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_const_sink_x_0_0 = qtgui.const_sink_c(
             len(data_carriers_idx), #size
             "data symbols", #name
@@ -278,8 +283,8 @@ class flowgraph(gr.top_block, Qt.QWidget):
             None # parent
         )
         self.qtgui_const_sink_x_0_0.set_update_time(0.2)
-        self.qtgui_const_sink_x_0_0.set_y_axis(-15, 15)
-        self.qtgui_const_sink_x_0_0.set_x_axis(-30, 30)
+        self.qtgui_const_sink_x_0_0.set_y_axis(-5, 5)
+        self.qtgui_const_sink_x_0_0.set_x_axis(-10, 10)
         self.qtgui_const_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
         self.qtgui_const_sink_x_0_0.enable_autoscale(False)
         self.qtgui_const_sink_x_0_0.enable_grid(True)
@@ -311,7 +316,11 @@ class flowgraph(gr.top_block, Qt.QWidget):
             self.qtgui_const_sink_x_0_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_const_sink_x_0_0_win = sip.wrapinstance(self.qtgui_const_sink_x_0_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_const_sink_x_0_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_const_sink_x_0_0_win, 4, 1, 1, 1)
+        for r in range(4, 5):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(1, 2):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_const_sink_x_0 = qtgui.const_sink_c(
             1024, #size
             "ofdm decoded symbols", #name
@@ -319,8 +328,8 @@ class flowgraph(gr.top_block, Qt.QWidget):
             None # parent
         )
         self.qtgui_const_sink_x_0.set_update_time(0.2)
-        self.qtgui_const_sink_x_0.set_y_axis(-15, 15)
-        self.qtgui_const_sink_x_0.set_x_axis(-30, 30)
+        self.qtgui_const_sink_x_0.set_y_axis(-5, 5)
+        self.qtgui_const_sink_x_0.set_x_axis(-10, 10)
         self.qtgui_const_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
         self.qtgui_const_sink_x_0.enable_autoscale(False)
         self.qtgui_const_sink_x_0.enable_grid(True)
@@ -352,7 +361,11 @@ class flowgraph(gr.top_block, Qt.QWidget):
             self.qtgui_const_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_const_sink_x_0_win = sip.wrapinstance(self.qtgui_const_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_const_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_const_sink_x_0_win, 4, 0, 1, 1)
+        for r in range(4, 5):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.iio_pluto_source_0 = iio.fmcomms2_source_fc32('' if '' else iio.get_pluto_uri(), [True, True], int(3e3))
         self.iio_pluto_source_0.set_len_tag_key('packet_len')
         self.iio_pluto_source_0.set_frequency(carrier_freq)
@@ -371,6 +384,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.iio_pluto_sink_0.set_attenuation(0, 30)
         self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
         self.fec_ber_bf_0 = fec.ber_bf(False, 10000000, -7.0)
+        self.digital_constellation_encoder_bc_0_0 = digital.constellation_encoder_bc(g_constellation)
         self.digital_constellation_encoder_bc_0 = digital.constellation_encoder_bc(g_constellation)
         self.digital_constellation_decoder_cb_0 = digital.constellation_decoder_cb(g_constellation)
         self.blocks_vector_to_stream_0_0_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, len(data_carriers_idx))
@@ -378,12 +392,52 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.blocks_vector_to_stream_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, 1024)
         self.blocks_vector_source_x_0_0 = blocks.vector_source_b(data_vec, True, 1, [])
         self.blocks_vector_source_x_0 = blocks.vector_source_b(data_vec, True, 1, [])
+        self.blocks_sub_xx_0 = blocks.sub_cc(1)
+        self.blocks_skiphead_0_1 = blocks.skiphead(gr.sizeof_gr_complex*1, 1000)
         self.blocks_skiphead_0_0 = blocks.skiphead(gr.sizeof_char*1, 1000)
         self.blocks_skiphead_0 = blocks.skiphead(gr.sizeof_char*1, 1000)
+        self.blocks_rms_xx_0 = blocks.rms_cf(0.00001)
         self.blocks_repack_bits_bb_0_0 = blocks.repack_bits_bb(2, 8, "", False, gr.GR_LSB_FIRST)
         self.blocks_repack_bits_bb_0 = blocks.repack_bits_bb(2, 8, "", False, gr.GR_LSB_FIRST)
         self.blocks_complex_to_mag_1 = blocks.complex_to_mag(1024)
         self.blocks_complex_to_mag_0 = blocks.complex_to_mag(1)
+        self.ber_est_lg = qtgui.number_sink(
+            gr.sizeof_float,
+            1,
+            qtgui.NUM_GRAPH_NONE,
+            1,
+            None # parent
+        )
+        self.ber_est_lg.set_update_time(0.10)
+        self.ber_est_lg.set_title("BER est lg")
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        units = ['', '', '', '', '',
+            '', '', '', '', '']
+        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
+            ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
+        factor = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+
+        for i in range(1):
+            self.ber_est_lg.set_min(i, 0)
+            self.ber_est_lg.set_max(i, 3)
+            self.ber_est_lg.set_color(i, colors[i][0], colors[i][1])
+            if len(labels[i]) == 0:
+                self.ber_est_lg.set_label(i, "Data {0}".format(i))
+            else:
+                self.ber_est_lg.set_label(i, labels[i])
+            self.ber_est_lg.set_unit(i, units[i])
+            self.ber_est_lg.set_factor(i, factor[i])
+
+        self.ber_est_lg.enable_autoscale(False)
+        self._ber_est_lg_win = sip.wrapinstance(self.ber_est_lg.qwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._ber_est_lg_win, 1, 1, 1, 1)
+        for r in range(1, 2):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(1, 2):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.OFDM_OOT_ofdm_retreive_data_sym_cc_0 = OFDM_OOT.ofdm_retreive_data_sym_cc(nfft=1024, data_carriers_idx=data_carriers_idx)
         self.OFDM_OOT_ofdm_precise_sync_cc_0 = OFDM_OOT.ofdm_precise_sync_cc(nfft=1024, pilot_carriers_idx=pilot_carriers_idx, pilot_carriers_vals=pilot_carriers_vals)
         self.OFDM_OOT_ofdm_modulator_cpp_cc_0 = OFDM_OOT.ofdm_modulator_cpp_cc(1024, data_carriers_idx, pilot_carriers_idx, pilot_carriers_vals, 128)
@@ -407,16 +461,22 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_complex_to_mag_1, 0), (self.qtgui_vector_sink_f_0, 0))
         self.connect((self.blocks_repack_bits_bb_0, 0), (self.blocks_skiphead_0, 0))
         self.connect((self.blocks_repack_bits_bb_0_0, 0), (self.blocks_skiphead_0_0, 0))
+        self.connect((self.blocks_rms_xx_0, 0), (self.snr_est, 0))
         self.connect((self.blocks_skiphead_0, 0), (self.fec_ber_bf_0, 0))
         self.connect((self.blocks_skiphead_0_0, 0), (self.fec_ber_bf_0, 1))
+        self.connect((self.blocks_skiphead_0_1, 0), (self.blocks_rms_xx_0, 0))
+        self.connect((self.blocks_sub_xx_0, 0), (self.blocks_skiphead_0_1, 0))
         self.connect((self.blocks_vector_source_x_0, 0), (self.digital_constellation_encoder_bc_0, 0))
         self.connect((self.blocks_vector_source_x_0_0, 0), (self.blocks_repack_bits_bb_0_0, 0))
+        self.connect((self.blocks_vector_source_x_0_0, 0), (self.digital_constellation_encoder_bc_0_0, 0))
         self.connect((self.blocks_vector_to_stream_0, 0), (self.qtgui_const_sink_x_0, 0))
         self.connect((self.blocks_vector_to_stream_0_0, 0), (self.qtgui_const_sink_x_0_0, 0))
+        self.connect((self.blocks_vector_to_stream_0_0_0, 0), (self.blocks_sub_xx_0, 0))
         self.connect((self.blocks_vector_to_stream_0_0_0, 0), (self.digital_constellation_decoder_cb_0, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.blocks_repack_bits_bb_0, 0))
         self.connect((self.digital_constellation_encoder_bc_0, 0), (self.OFDM_OOT_ofdm_modulator_cpp_cc_0, 0))
-        self.connect((self.fec_ber_bf_0, 0), (self.qtgui_time_sink_x_1, 0))
+        self.connect((self.digital_constellation_encoder_bc_0_0, 0), (self.blocks_sub_xx_0, 1))
+        self.connect((self.fec_ber_bf_0, 0), (self.ber_est_lg, 0))
         self.connect((self.iio_pluto_source_0, 0), (self.OFDM_OOT_ofdm_corr_sync_cpp_cc_0, 0))
         self.connect((self.iio_pluto_source_0, 0), (self.qtgui_freq_sink_x_0, 0))
 
@@ -459,7 +519,6 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.iio_pluto_sink_0.set_samplerate(self.samp_rate)
         self.iio_pluto_source_0.set_samplerate(self.samp_rate)
         self.qtgui_freq_sink_x_0.set_frequency_range(self.carrier_freq, self.samp_rate)
-        self.qtgui_time_sink_x_1.set_samp_rate(self.samp_rate)
 
     def get_pilot_carriers_vals(self):
         return self.pilot_carriers_vals

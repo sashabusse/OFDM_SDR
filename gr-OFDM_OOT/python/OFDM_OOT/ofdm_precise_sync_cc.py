@@ -61,6 +61,10 @@ class ofdm_precise_sync_cc(gr.basic_block):
         phase_diff[phase_diff > np.pi] -= 2*np.pi
         in_iq *= np.exp(-1j*np.mean(phase_diff))
 
+        # scale average pilot amplitude
+        mul = np.mean(np.abs(self.pilot_carriers_vals) / np.abs(in_iq[self.pilot_carriers_idx]))
+        in_iq *= mul
+
         return in_iq
 
     def general_work(self, input_items, output_items):
