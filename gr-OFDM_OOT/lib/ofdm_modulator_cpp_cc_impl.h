@@ -15,6 +15,16 @@
 namespace gr {
 namespace OFDM_OOT {
 
+/**
+ * @brief implements ofdm multiplexing
+ *
+ * @param nfft
+ * @param n_guard length of cyclic prefix
+ * @param data_carriers_idx indices to use for data multiplexing
+ * @param pilot_carriers_idx indices to use for pilot placement
+ * @param pilot_carriers_vals values to use for pilots
+ *
+ */
 class ofdm_modulator_cpp_cc_impl : public ofdm_modulator_cpp_cc
 {
 private:
@@ -45,6 +55,7 @@ public:
                      gr_vector_void_star& output_items);
 
 private:
+    // multiplex single ofdm symbol
     void multiplex(const gr_complex* in_iq, gr_complex* out);
 };
 

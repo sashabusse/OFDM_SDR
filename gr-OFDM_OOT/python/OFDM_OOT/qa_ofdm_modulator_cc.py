@@ -41,7 +41,6 @@ class qa_ofdm_modulator_cc(gr_unittest.TestCase):
         src = blocks.vector_source_c(tuple(src_iq))
         dst = blocks.vector_sink_c()
 
-        print("before connecting", flush=True)
         self.tb.connect(src, mod)
         self.tb.connect(mod, dst)
         self.tb.run()

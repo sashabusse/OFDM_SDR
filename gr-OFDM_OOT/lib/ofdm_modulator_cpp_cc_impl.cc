@@ -9,9 +9,11 @@
 #include <gnuradio/io_signature.h>
 
 
-// uncomment to enable debug outputs
+// uncomment to enable debug outputs to std::out
 //#define OFDM_MODULATOR_CPP_DEBUG_OUT
 
+// uncomment to disable 1/N division after fft conversion
+//#define OFDM_MODULATOR_CPP_DIV_N_DISABLE
 
 namespace gr {
 namespace OFDM_OOT {
@@ -19,11 +21,12 @@ namespace OFDM_OOT {
 using input_type = gr_complex;
 using output_type = gr_complex;
 
-ofdm_modulator_cpp_cc::sptr ofdm_modulator_cpp_cc::make(int nfft,
-                                                        gr_vector_int data_carriers_idx,
-                                                        gr_vector_int pilot_carriers_idx,
-                                                        std::vector<gr_complex> pilot_carriers_vals,
-                                                        int n_guard)
+ofdm_modulator_cpp_cc::sptr
+ofdm_modulator_cpp_cc::make(int nfft,
+                            gr_vector_int data_carriers_idx,
+                            gr_vector_int pilot_carriers_idx,
+                            std::vector<gr_complex> pilot_carriers_vals,
+                            int n_guard)
 {
     return gnuradio::make_block_sptr<ofdm_modulator_cpp_cc_impl>(
         nfft, data_carriers_idx, pilot_carriers_idx, pilot_carriers_vals);
@@ -33,11 +36,12 @@ ofdm_modulator_cpp_cc::sptr ofdm_modulator_cpp_cc::make(int nfft,
 /*
  * The private constructor
  */
-ofdm_modulator_cpp_cc_impl::ofdm_modulator_cpp_cc_impl(int nfft,
-                                                       gr_vector_int data_carriers_idx,
-                                                       gr_vector_int pilot_carriers_idx,
-                                                       std::vector<gr_complex> pilot_carriers_vals,
-                                                       int n_guard)
+ofdm_modulator_cpp_cc_impl::ofdm_modulator_cpp_cc_impl(
+    int nfft,
+    gr_vector_int data_carriers_idx,
+    gr_vector_int pilot_carriers_idx,
+    std::vector<gr_complex> pilot_carriers_vals,
+    int n_guard)
     : gr::block("ofdm_modulator_cpp_cc",
                 gr::io_signature::make(1, 1, sizeof(input_type)),
                 gr::io_signature::make(1, 1, sizeof(output_type))),
@@ -68,8 +72,10 @@ void ofdm_modulator_cpp_cc_impl::forecast(int noutput_items,
         (noutput_items / (nfft + n_guard)) * data_carriers_idx.size();
 
 #ifdef OFDM_MODULATOR_CPP_DEBUG_OUT
-    std::cout << "ofdm_modulator_cpp_cc.forecast(noutput_items=" << noutput_items; 
-    std::cout << ", ninput_items_required[0]=" << ninput_items_required[0] << ")" << std::endl << std::flush;
+    std::cout << "ofdm_modulator_cpp_cc.forecast(noutput_items=" << noutput_items;
+    std::cout << ", ninput_items_required[0]=" << ninput_items_required[0] << ")"
+              << std::endl
+              << std::flush;
 #endif
 }
 
@@ -89,10 +95,10 @@ int ofdm_modulator_cpp_cc_impl::general_work(int noutput_items,
     int sym_cnt_out = noutput_items / sym_len;
     int sym_cnt = std::min(sym_cnt_in, sym_cnt_out);
 
-    
+
 #ifdef OFDM_MODULATOR_CPP_DEBUG_OUT
-    std::cout << "ofdm_modulator_cpp_cc.general_work(noutput_items=" << noutput_items; 
-    std::cout << ", ninput_items[0]=" << ninput_items[0]; 
+    std::cout << "ofdm_modulator_cpp_cc.general_work(noutput_items=" << noutput_items;
+    std::cout << ", ninput_items[0]=" << ninput_items[0];
     std::cout << ", sym_cnt=" << sym_cnt << ")" << std::endl << std::flush;
 #endif
 
@@ -120,28 +126,27 @@ int ofdm_modulator_cpp_cc_impl::general_work(int noutput_items,
 void ofdm_modulator_cpp_cc_impl::multiplex(const gr_complex* in_iq, gr_complex* out)
 {
     gr_complex* fft_in = fft_sptr->get_inbuf();
-    
-    // fill in spectrum
 
-    std::fill(fft_in, fft_in+nfft, gr_complex(0, 0));
-    for(size_t i=0;i<data_carriers_idx.size();i++)
-    {
+    // fill in spectrum
+    std::fill(fft_in, fft_in + nfft, gr_complex(0, 0));
+    for (size_t i = 0; i < data_carriers_idx.size(); i++) {
         fft_in[data_carriers_idx[i]] = in_iq[i];
     }
-    for(size_t i=0;i<pilot_carriers_idx.size();i++)
-    {
+    for (size_t i = 0; i < pilot_carriers_idx.size(); i++) {
         fft_in[pilot_carriers_idx[i]] = pilot_carriers_vals[i];
     }
 
     // compute ifft to out
     fft_sptr->execute();
-
     std::copy(fft_sptr->get_outbuf(), fft_sptr->get_outbuf() + nfft, out + n_guard);
+
     // fft is implemented without 1/N probably may be ommited
-    for(int i=0;i<nfft;i++)
-    {
-        out[i+n_guard]/=nfft;
+    // be carefull make test will fail if disabled
+#ifndef OFDM_MODULATOR_CPP_DIV_N_DISABLE
+    for (int i = 0; i < nfft; i++) {
+        out[i + n_guard] /= nfft;
     }
+#endif
 
     // add guard
     std::copy(out + nfft, out + nfft + n_guard, out);

@@ -26,7 +26,6 @@ from gnuradio.filter import firdes
 import sip
 from gnuradio import OFDM_OOT
 from gnuradio import blocks
-import pmt
 from gnuradio import digital
 from gnuradio import gr
 from gnuradio.fft import window
@@ -81,17 +80,22 @@ class flowgraph(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = int(1e6)
-        self.g_qam16_cd = g_qam16_cd = {"map": np.array(digital.qam_16()[0])[digital.qam_16()[1]]*4/np.linalg.norm(digital.qam_16()[0]), 'bw': 4}
-        self.lpf_taps = lpf_taps = firdes.low_pass(1.0, 4*samp_rate, samp_rate,samp_rate/8, window.WIN_HAMMING, 6.76)
+        self.pilot_carriers_idx = pilot_carriers_idx = [i for i in range(1, 2+2*128, 2)]
         self.g_qpsk_cd = g_qpsk_cd = {"map": [-1-1j, -1+1j, 1-1j, 1+1j], "bw": 2}
-        self.g_cd = g_cd = g_qam16_cd
+        self.qpsk_constellation = qpsk_constellation = digital.constellation_qpsk().base()
+        self.pilot_carriers_vals = pilot_carriers_vals = ([2, -2]*(len(pilot_carriers_idx)//2)) + ([2]*(len(pilot_carriers_idx)%2))
+        self.lpf_taps = lpf_taps = firdes.low_pass(1.0, 4*samp_rate, samp_rate,samp_rate/8, window.WIN_HAMMING, 6.76)
+        self.g_qam16_cd = g_qam16_cd = {"map": np.array(digital.qam_16()[0])[digital.qam_16()[1]]*4/np.linalg.norm(digital.qam_16()[0]), 'bw': 4}
+        self.g_cd = g_cd = g_qpsk_cd
         self.g_bpsk_cd = g_bpsk_cd = {"map": [-1., 1.], "bw": 1}
-        self.carrier_freq = carrier_freq = int(1.970e9)
+        self.data_vec = data_vec = np.random.randint(0, 4, 1024)
+        self.data_carriers_idx = data_carriers_idx = [i for i in range(2, 3+2*127, 2)]
+        self.carrier_freq = carrier_freq = int(2.050e9)
 
         ##################################################
         # Blocks
         ##################################################
-        self._carrier_freq_range = Range(int(1.8e9), int(2.2e9), int(0.001e9), int(1.970e9), 200)
+        self._carrier_freq_range = Range(int(1.8e9), int(2.2e9), int(0.001e9), int(2.050e9), 200)
         self._carrier_freq_win = RangeWidget(self._carrier_freq_range, self.set_carrier_freq, "carrier_freq", "counter_slider", int, QtCore.Qt.Horizontal)
         self.top_layout.addWidget(self._carrier_freq_win)
         self.qtgui_vector_sink_f_0 = qtgui.vector_sink_f(
@@ -133,7 +137,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self._qtgui_vector_sink_f_0_win = sip.wrapinstance(self.qtgui_vector_sink_f_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_vector_sink_f_0_win)
         self.qtgui_time_sink_x_0 = qtgui.time_sink_f(
-            4096, #size
+            4096*2, #size
             1, #samp_rate
             "", #name
             1, #number of inputs
@@ -145,7 +149,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.set_y_label('Amplitude', "")
 
         self.qtgui_time_sink_x_0.enable_tags(True)
-        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_TAG, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "packet_len")
         self.qtgui_time_sink_x_0.enable_autoscale(False)
         self.qtgui_time_sink_x_0.enable_grid(True)
         self.qtgui_time_sink_x_0.enable_axis_labels(True)
@@ -180,7 +184,89 @@ class flowgraph(gr.top_block, Qt.QWidget):
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
-        self.iio_pluto_source_0 = iio.fmcomms2_source_fc32('' if '' else iio.get_pluto_uri(), [True, True], int(samp_rate/10))
+        self.qtgui_const_sink_x_0_0 = qtgui.const_sink_c(
+            128, #size
+            "", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_const_sink_x_0_0.set_update_time(0.2)
+        self.qtgui_const_sink_x_0_0.set_y_axis(-15, 15)
+        self.qtgui_const_sink_x_0_0.set_x_axis(-30, 30)
+        self.qtgui_const_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
+        self.qtgui_const_sink_x_0_0.enable_autoscale(False)
+        self.qtgui_const_sink_x_0_0.enable_grid(True)
+        self.qtgui_const_sink_x_0_0.enable_axis_labels(True)
+
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ["blue", "red", "red", "red", "red",
+            "red", "red", "red", "red", "red"]
+        styles = [0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0]
+        markers = [0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_const_sink_x_0_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_const_sink_x_0_0.set_line_label(i, labels[i])
+            self.qtgui_const_sink_x_0_0.set_line_width(i, widths[i])
+            self.qtgui_const_sink_x_0_0.set_line_color(i, colors[i])
+            self.qtgui_const_sink_x_0_0.set_line_style(i, styles[i])
+            self.qtgui_const_sink_x_0_0.set_line_marker(i, markers[i])
+            self.qtgui_const_sink_x_0_0.set_line_alpha(i, alphas[i])
+
+        self._qtgui_const_sink_x_0_0_win = sip.wrapinstance(self.qtgui_const_sink_x_0_0.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_const_sink_x_0_0_win)
+        self.qtgui_const_sink_x_0 = qtgui.const_sink_c(
+            1000, #size
+            "", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_const_sink_x_0.set_update_time(0.2)
+        self.qtgui_const_sink_x_0.set_y_axis(-15, 15)
+        self.qtgui_const_sink_x_0.set_x_axis(-30, 30)
+        self.qtgui_const_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
+        self.qtgui_const_sink_x_0.enable_autoscale(False)
+        self.qtgui_const_sink_x_0.enable_grid(True)
+        self.qtgui_const_sink_x_0.enable_axis_labels(True)
+
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ["blue", "red", "red", "red", "red",
+            "red", "red", "red", "red", "red"]
+        styles = [0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0]
+        markers = [0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_const_sink_x_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_const_sink_x_0.set_line_label(i, labels[i])
+            self.qtgui_const_sink_x_0.set_line_width(i, widths[i])
+            self.qtgui_const_sink_x_0.set_line_color(i, colors[i])
+            self.qtgui_const_sink_x_0.set_line_style(i, styles[i])
+            self.qtgui_const_sink_x_0.set_line_marker(i, markers[i])
+            self.qtgui_const_sink_x_0.set_line_alpha(i, alphas[i])
+
+        self._qtgui_const_sink_x_0_win = sip.wrapinstance(self.qtgui_const_sink_x_0.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_const_sink_x_0_win)
+        self.iio_pluto_source_0 = iio.fmcomms2_source_fc32('' if '' else iio.get_pluto_uri(), [True, True], int(3e3))
         self.iio_pluto_source_0.set_len_tag_key('packet_len')
         self.iio_pluto_source_0.set_frequency(carrier_freq)
         self.iio_pluto_source_0.set_samplerate(samp_rate)
@@ -190,22 +276,24 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.iio_pluto_source_0.set_rfdc(True)
         self.iio_pluto_source_0.set_bbdc(True)
         self.iio_pluto_source_0.set_filter_params('Auto', '', 0, 0)
-        self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('' if '' else iio.get_pluto_uri(), [True, True], int(samp_rate/10), False)
+        self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('' if '' else iio.get_pluto_uri(), [True, True], int(samp_rate*2), True)
         self.iio_pluto_sink_0.set_len_tag_key('')
-        self.iio_pluto_sink_0.set_bandwidth(20000000)
+        self.iio_pluto_sink_0.set_bandwidth(int(1e6))
         self.iio_pluto_sink_0.set_frequency(carrier_freq)
         self.iio_pluto_sink_0.set_samplerate(samp_rate)
-        self.iio_pluto_sink_0.set_attenuation(0, 10)
+        self.iio_pluto_sink_0.set_attenuation(0, 30)
         self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
-        self.digital_chunks_to_symbols_xx_0 = digital.chunks_to_symbols_bc(g_cd['map'], 1)
-        self.blocks_packed_to_unpacked_xx_0 = blocks.packed_to_unpacked_bb(g_cd['bw'], gr.GR_MSB_FIRST)
+        self.digital_constellation_encoder_bc_0 = digital.constellation_encoder_bc(qpsk_constellation)
+        self.blocks_vector_to_stream_0_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, len(data_carriers_idx))
+        self.blocks_vector_to_stream_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, 1024)
+        self.blocks_vector_source_x_0 = blocks.vector_source_b(data_vec, True, 1, [])
         self.blocks_null_sink_0_0 = blocks.null_sink(gr.sizeof_gr_complex*1024)
         self.blocks_null_sink_0 = blocks.null_sink(gr.sizeof_gr_complex*1)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, '/home/sashabusse/dev/SDR/OFDM/data/cat.jpg', True, 0, 0)
-        self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
         self.blocks_complex_to_mag_1 = blocks.complex_to_mag(1024)
         self.blocks_complex_to_mag_0 = blocks.complex_to_mag(1)
-        self.OFDM_OOT_ofdm_modulator_cpp_cc_0 = OFDM_OOT.ofdm_modulator_cpp_cc(1024, [i for i in range(2, 301, 2)], [i for i in range(1, 302, 2)], [1]*151, 128)
+        self.OFDM_OOT_ofdm_retreive_data_sym_cc_0 = OFDM_OOT.ofdm_retreive_data_sym_cc(nfft=1024, data_carriers_idx=data_carriers_idx)
+        self.OFDM_OOT_ofdm_precise_sync_cc_0 = OFDM_OOT.ofdm_precise_sync_cc(nfft=1024, pilot_carriers_idx=pilot_carriers_idx, pilot_carriers_vals=pilot_carriers_vals)
+        self.OFDM_OOT_ofdm_modulator_cpp_cc_0 = OFDM_OOT.ofdm_modulator_cpp_cc(1024, data_carriers_idx, pilot_carriers_idx, pilot_carriers_vals, 128)
         self.OFDM_OOT_ofdm_corr_sync_demultiplex_0 = OFDM_OOT.ofdm_corr_sync_demultiplex(1024)
         self.OFDM_OOT_ofdm_corr_sync_cpp_cc_0 = OFDM_OOT.ofdm_corr_sync_cpp_cc(nfft=1024, n_guard=128, corr_sz=64)
 
@@ -216,14 +304,19 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.connect((self.OFDM_OOT_ofdm_corr_sync_cpp_cc_0, 0), (self.OFDM_OOT_ofdm_corr_sync_demultiplex_0, 0))
         self.connect((self.OFDM_OOT_ofdm_corr_sync_cpp_cc_0, 1), (self.blocks_complex_to_mag_0, 0))
         self.connect((self.OFDM_OOT_ofdm_corr_sync_cpp_cc_0, 0), (self.blocks_null_sink_0, 0))
-        self.connect((self.OFDM_OOT_ofdm_corr_sync_demultiplex_0, 0), (self.blocks_complex_to_mag_1, 0))
+        self.connect((self.OFDM_OOT_ofdm_corr_sync_demultiplex_0, 0), (self.OFDM_OOT_ofdm_precise_sync_cc_0, 0))
         self.connect((self.OFDM_OOT_ofdm_corr_sync_demultiplex_0, 0), (self.blocks_null_sink_0_0, 0))
         self.connect((self.OFDM_OOT_ofdm_modulator_cpp_cc_0, 0), (self.iio_pluto_sink_0, 0))
+        self.connect((self.OFDM_OOT_ofdm_precise_sync_cc_0, 0), (self.OFDM_OOT_ofdm_retreive_data_sym_cc_0, 0))
+        self.connect((self.OFDM_OOT_ofdm_precise_sync_cc_0, 0), (self.blocks_complex_to_mag_1, 0))
+        self.connect((self.OFDM_OOT_ofdm_precise_sync_cc_0, 0), (self.blocks_vector_to_stream_0, 0))
+        self.connect((self.OFDM_OOT_ofdm_retreive_data_sym_cc_0, 0), (self.blocks_vector_to_stream_0_0, 0))
         self.connect((self.blocks_complex_to_mag_0, 0), (self.qtgui_time_sink_x_0, 0))
         self.connect((self.blocks_complex_to_mag_1, 0), (self.qtgui_vector_sink_f_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.blocks_packed_to_unpacked_xx_0, 0))
-        self.connect((self.blocks_packed_to_unpacked_xx_0, 0), (self.digital_chunks_to_symbols_xx_0, 0))
-        self.connect((self.digital_chunks_to_symbols_xx_0, 0), (self.OFDM_OOT_ofdm_modulator_cpp_cc_0, 0))
+        self.connect((self.blocks_vector_source_x_0, 0), (self.digital_constellation_encoder_bc_0, 0))
+        self.connect((self.blocks_vector_to_stream_0, 0), (self.qtgui_const_sink_x_0, 0))
+        self.connect((self.blocks_vector_to_stream_0_0, 0), (self.qtgui_const_sink_x_0_0, 0))
+        self.connect((self.digital_constellation_encoder_bc_0, 0), (self.OFDM_OOT_ofdm_modulator_cpp_cc_0, 0))
         self.connect((self.iio_pluto_source_0, 0), (self.OFDM_OOT_ofdm_corr_sync_cpp_cc_0, 0))
 
 
@@ -244,12 +337,31 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.iio_pluto_sink_0.set_samplerate(self.samp_rate)
         self.iio_pluto_source_0.set_samplerate(self.samp_rate)
 
-    def get_g_qam16_cd(self):
-        return self.g_qam16_cd
+    def get_pilot_carriers_idx(self):
+        return self.pilot_carriers_idx
 
-    def set_g_qam16_cd(self, g_qam16_cd):
-        self.g_qam16_cd = g_qam16_cd
-        self.set_g_cd(self.g_qam16_cd)
+    def set_pilot_carriers_idx(self, pilot_carriers_idx):
+        self.pilot_carriers_idx = pilot_carriers_idx
+        self.set_pilot_carriers_vals(([2, -2]*(len(self.pilot_carriers_idx)//2)) + ([2]*(len(self.pilot_carriers_idx)%2)))
+
+    def get_g_qpsk_cd(self):
+        return self.g_qpsk_cd
+
+    def set_g_qpsk_cd(self, g_qpsk_cd):
+        self.g_qpsk_cd = g_qpsk_cd
+        self.set_g_cd(self.g_qpsk_cd)
+
+    def get_qpsk_constellation(self):
+        return self.qpsk_constellation
+
+    def set_qpsk_constellation(self, qpsk_constellation):
+        self.qpsk_constellation = qpsk_constellation
+
+    def get_pilot_carriers_vals(self):
+        return self.pilot_carriers_vals
+
+    def set_pilot_carriers_vals(self, pilot_carriers_vals):
+        self.pilot_carriers_vals = pilot_carriers_vals
 
     def get_lpf_taps(self):
         return self.lpf_taps
@@ -257,24 +369,36 @@ class flowgraph(gr.top_block, Qt.QWidget):
     def set_lpf_taps(self, lpf_taps):
         self.lpf_taps = lpf_taps
 
-    def get_g_qpsk_cd(self):
-        return self.g_qpsk_cd
+    def get_g_qam16_cd(self):
+        return self.g_qam16_cd
 
-    def set_g_qpsk_cd(self, g_qpsk_cd):
-        self.g_qpsk_cd = g_qpsk_cd
+    def set_g_qam16_cd(self, g_qam16_cd):
+        self.g_qam16_cd = g_qam16_cd
 
     def get_g_cd(self):
         return self.g_cd
 
     def set_g_cd(self, g_cd):
         self.g_cd = g_cd
-        self.digital_chunks_to_symbols_xx_0.set_symbol_table(self.g_cd['map'])
 
     def get_g_bpsk_cd(self):
         return self.g_bpsk_cd
 
     def set_g_bpsk_cd(self, g_bpsk_cd):
         self.g_bpsk_cd = g_bpsk_cd
+
+    def get_data_vec(self):
+        return self.data_vec
+
+    def set_data_vec(self, data_vec):
+        self.data_vec = data_vec
+        self.blocks_vector_source_x_0.set_data(self.data_vec, [])
+
+    def get_data_carriers_idx(self):
+        return self.data_carriers_idx
+
+    def set_data_carriers_idx(self, data_carriers_idx):
+        self.data_carriers_idx = data_carriers_idx
 
     def get_carrier_freq(self):
         return self.carrier_freq

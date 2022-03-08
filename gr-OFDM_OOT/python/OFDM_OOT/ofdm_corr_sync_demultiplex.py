@@ -14,7 +14,13 @@ import pmt
 
 class ofdm_corr_sync_demultiplex(gr.basic_block):
     """
-    docstring for block ofdm_corr_sync_demultiplex
+    @brief  implements ofdm demultiplexing 
+            with freq_offset elimination 
+            triggered by 'ofdm_corr_sync' tag.
+    
+    @param nfft
+
+    @output stream is vec_complex and is stream of ofdm symbols with rough syncronization
     """
     def __init__(self, nfft=1024):
         gr.basic_block.__init__(self,
@@ -44,10 +50,9 @@ class ofdm_corr_sync_demultiplex(gr.basic_block):
         ninput_items = len(input_items[0])
         noutput_items = len(output_items[0])
 
-        tags = self.get_tags_in_window(0, 0, ninput_items-self.nfft)
+        tags = self.get_tags_in_window(0, 0, ninput_items-self.nfft + 1)
 
         items_processed = 0
-        input_consumed = 0
         for tag in tags:
             if pmt.to_python(tag.key) != 'ofdm_corr_sync':
                 continue
@@ -60,8 +65,6 @@ class ofdm_corr_sync_demultiplex(gr.basic_block):
             freq_offset = pmt.to_python(tag.value)
             output_items[0][items_processed] = np.fft.fft( vec*np.exp(-1j*(2*np.pi)*freq_offset*np.arange(self.nfft)) )
 
-            input_consumed = max(input_consumed, tag_rel_offset + 1)
-
             items_processed += 1
 
 
@@ -73,9 +76,6 @@ class ofdm_corr_sync_demultiplex(gr.basic_block):
         #     noutput_items, ninput_items, items_processed, input_consumed), flush=True)
 
         # if no tags just consume input otherwise program will hang
-        if len(tags) == 0:
-            self.consume_each(ninput_items)
-        else:
-            self.consume_each(input_consumed)
+        self.consume_each(ninput_items-self.nfft + 1)
         return items_processed
 

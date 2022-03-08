@@ -10,5 +10,7 @@ install(FILES
     OFDM_OOT_ofdm_corr_sync_cc.block.yml
     OFDM_OOT_ofdm_modulator_cpp_cc.block.yml
     OFDM_OOT_ofdm_corr_sync_cpp_cc.block.yml
-    OFDM_OOT_ofdm_corr_sync_demultiplex.block.yml DESTINATION share/gnuradio/grc/blocks
+    OFDM_OOT_ofdm_corr_sync_demultiplex.block.yml
+    OFDM_OOT_ofdm_precise_sync_cc.block.yml
+    OFDM_OOT_ofdm_retreive_data_sym_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )

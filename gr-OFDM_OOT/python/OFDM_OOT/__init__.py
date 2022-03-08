@@ -23,5 +23,7 @@ except ModuleNotFoundError:
 from .ofdm_modulator_cc import ofdm_modulator_cc
 from .ofdm_corr_sync_cc import ofdm_corr_sync_cc
 from .ofdm_corr_sync_demultiplex import ofdm_corr_sync_demultiplex
+from .ofdm_precise_sync_cc import ofdm_precise_sync_cc
+from .ofdm_retreive_data_sym_cc import ofdm_retreive_data_sym_cc
 
 #
