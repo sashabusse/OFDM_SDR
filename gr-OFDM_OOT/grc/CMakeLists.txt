@@ -6,8 +6,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 install(FILES
-    OFDM_OOT_ofdm_modulator_cc.block.yml
-    OFDM_OOT_ofdm_corr_sync_cc.block.yml
     OFDM_OOT_ofdm_modulator_cpp_cc.block.yml
     OFDM_OOT_ofdm_corr_sync_cpp_cc.block.yml
     OFDM_OOT_ofdm_corr_sync_demultiplex.block.yml
