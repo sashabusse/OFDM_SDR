@@ -22,9 +22,9 @@ add_subdirectory(bindings)
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
-    ofdm_corr_sync_demultiplex.py
     ofdm_precise_sync_cc.py
-    ofdm_retreive_data_sym_cc.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
+    ofdm_retreive_data_sym_cc.py
+    ofdm_corr_sync_demultiplex_cc.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
 )
 
 ########################################################################
@@ -43,6 +43,6 @@ add_custom_target(
 )
 GR_ADD_TEST(qa_ofdm_modulator_cpp_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_modulator_cpp_cc.py)
 GR_ADD_TEST(qa_ofdm_corr_sync_cpp_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_corr_sync_cpp_cc.py)
-GR_ADD_TEST(qa_ofdm_corr_sync_demultiplex ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_corr_sync_demultiplex.py)
 GR_ADD_TEST(qa_ofdm_precise_sync_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_precise_sync_cc.py)
 GR_ADD_TEST(qa_ofdm_retreive_data_sym_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_retreive_data_sym_cc.py)
+GR_ADD_TEST(qa_ofdm_corr_sync_demultiplex_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_corr_sync_demultiplex_cc.py)

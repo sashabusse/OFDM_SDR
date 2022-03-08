@@ -12,7 +12,7 @@ from gnuradio import gr
 import pmt
 
 
-class ofdm_corr_sync_demultiplex(gr.basic_block):
+class ofdm_corr_sync_demultiplex_cc(gr.basic_block):
     """
     @brief  implements ofdm demultiplexing 
             with freq_offset elimination 
@@ -78,4 +78,3 @@ class ofdm_corr_sync_demultiplex(gr.basic_block):
         # if no tags just consume input otherwise program will hang
         self.consume_each(ninput_items-self.nfft + 1)
         return items_processed
-

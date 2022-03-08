@@ -1,10 +1,10 @@
-id: OFDM_OOT_ofdm_corr_sync_demultiplex
-label: ofdm_corr_sync_demultiplex
+id: OFDM_OOT_ofdm_corr_sync_demultiplex_cc
+label: ofdm_corr_sync_demultiplex_cc
 category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.ofdm_corr_sync_demultiplex(${nfft})
+  make: OFDM_OOT.ofdm_corr_sync_demultiplex_cc(nfft=${nfft})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -15,8 +15,9 @@ templates:
 parameters:
 - id: nfft
   label: nfft
-  dtype: int
+  dtype: complex
   default: 1024
+
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -29,14 +30,14 @@ inputs:
 - label: in
   domain: stream
   dtype: complex
-  optional: False
+  optional: false
 
 outputs:
 - label: out
   domain: stream
   dtype: complex
   vlen: ${nfft}
-  optional: False
+  optional: false
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

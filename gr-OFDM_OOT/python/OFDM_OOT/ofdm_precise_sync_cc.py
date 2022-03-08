@@ -80,6 +80,3 @@ class ofdm_precise_sync_cc(gr.basic_block):
 
 
 
-
-
-

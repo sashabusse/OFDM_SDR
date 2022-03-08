@@ -22,8 +22,9 @@ except ModuleNotFoundError:
 # import any pure python here
 
 
-from .ofdm_corr_sync_demultiplex import ofdm_corr_sync_demultiplex
+
 from .ofdm_precise_sync_cc import ofdm_precise_sync_cc
 from .ofdm_retreive_data_sym_cc import ofdm_retreive_data_sym_cc
+from .ofdm_corr_sync_demultiplex_cc import ofdm_corr_sync_demultiplex_cc
 
 #
