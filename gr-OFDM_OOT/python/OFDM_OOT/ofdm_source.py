@@ -21,7 +21,7 @@ class ofdm_source(gr.sync_block):
         gr.sync_block.__init__(self,
             name="ofdm_source",
             in_sig=None,
-            out_sig=[(np.complex64, (nfft + ncp)*2), ])
+            out_sig=[(np.complex64, (nfft + ncp)*2 + 200), ])
 
 
     def work(self, input_items, output_items):
@@ -46,7 +46,7 @@ class ofdm_source(gr.sync_block):
         ofdm_sym_t = np.fft.ifft(ofdm_sym_f)
         ofdm_sym_t = ofdm_sym_t * np.sqrt(ofdm_sym_t.size / np.sum(np.abs(ofdm_sym_t)**2))
 
-        frame = np.hstack([train_sym1_t[-ncp:], train_sym1_t] + [ofdm_sym_t[-ncp:], ofdm_sym_t])
+        frame = np.hstack([train_sym1_t[-ncp:], train_sym1_t] + [ofdm_sym_t[-ncp:], ofdm_sym_t] + [np.zeros(200)])
 
-        out[0] = np.flip(frame)
+        out[0] = frame
         return 1

@@ -21,10 +21,8 @@ namespace py = pybind11;
 // Please do not delete
 /**************************************/
 // BINDING_FUNCTION_PROTOTYPES(
-    void bind_ofdm_modulator_cpp_cc(py::module& m);
-    void bind_ofdm_corr_sync_cpp_cc(py::module& m);
-    void bind_autocorr_cpp_cccc(py::module& m);
-    void bind_cfar_detector_cpp_ccc(py::module& m);
+    void bind_autocorr_cpp_cc(py::module& m);
+    void bind_cfar_detector_cpp(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -53,9 +51,7 @@ PYBIND11_MODULE(OFDM_OOT_python, m)
     // Please do not delete
     /**************************************/
     // BINDING_FUNCTION_CALLS(
-    bind_ofdm_modulator_cpp_cc(m);
-    bind_ofdm_corr_sync_cpp_cc(m);
-    bind_autocorr_cpp_cccc(m);
-    bind_cfar_detector_cpp_ccc(m);
+    bind_autocorr_cpp_cc(m);
+    bind_cfar_detector_cpp(m);
     // ) END BINDING_FUNCTION_CALLS
 }

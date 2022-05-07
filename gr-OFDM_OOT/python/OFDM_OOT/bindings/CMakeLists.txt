@@ -28,10 +28,8 @@ include(GrPybind)
 # Python Bindings
 ########################################################################
 list(APPEND OFDM_OOT_python_files
-    ofdm_modulator_cpp_cc_python.cc
-    ofdm_corr_sync_cpp_cc_python.cc
-    autocorr_cpp_cccc_python.cc
-    cfar_detector_cpp_ccc_python.cc python_bindings.cc)
+    autocorr_cpp_cc_python.cc
+    cfar_detector_cpp_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(OFDM_OOT
    ../../..

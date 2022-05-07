@@ -33,6 +33,9 @@ from .ofdm_source import ofdm_source
 from .socket_source_c import socket_source_c
 from .test_block import test_block
 from .retrieve_vector_on_tag_cc import retrieve_vector_on_tag_cc
+from .ofdm_preamble_sync import ofdm_preamble_sync
+from .cfar_detector import cfar_detector
+from .autocorr_cc import autocorr_cc
 
 
 #

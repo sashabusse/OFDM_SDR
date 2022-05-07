@@ -41,14 +41,14 @@ class test_block(gr.basic_block):
     def process_next(self, iq_t, corr_arg):
         # determine frequency offset from repeatative train sym
         train_sym_corr = iq_t[ncp//2:ncp//2+nfft//2].conj() @ iq_t[ncp//2+nfft//2: ncp//2 + nfft]
-        freq_offset = np.angle(train_sym_corr)/(nfft//2)/(2*np.pi)
+        freq_offset = corr_arg/(2*np.pi)/(nfft/2)
         
         # eliminate freq offset
         iq_t *= np.exp(-2j*np.pi*freq_offset*np.arange(iq_t.size))
 
         # retrieve data ofdm sym
         ofdm_sym_t = iq_t[(ncp+nfft)+ncp//2:(ncp+nfft)+ncp//2+nfft]
-        ofdm_sym_f = np.fft.ifft(ofdm_sym_t) 
+        ofdm_sym_f = np.fft.fft(ofdm_sym_t) 
         # eliminate phase rotation caused by taking start from middle of cp
         ofdm_sym_f *= np.exp(2j*np.pi*np.arange(nfft)*(ncp//2)/nfft)
 

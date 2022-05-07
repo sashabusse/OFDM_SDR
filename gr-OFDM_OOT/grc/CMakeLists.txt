@@ -6,18 +6,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 install(FILES
-    OFDM_OOT_ofdm_modulator_cpp_cc.block.yml
-    OFDM_OOT_ofdm_corr_sync_cpp_cc.block.yml
     OFDM_OOT_ofdm_precise_sync_cc.block.yml
     OFDM_OOT_ofdm_retreive_data_sym_cc.block.yml
     OFDM_OOT_ofdm_corr_sync_demultiplex_cc.block.yml
     OFDM_OOT_BER_bbb.block.yml
-    OFDM_OOT_autocorr_cpp_cccc.block.yml
     OFDM_OOT_ofdm_symbols_stitching.block.yml
     OFDM_OOT_vector_concat.block.yml
     OFDM_OOT_ofdm_source.block.yml
     OFDM_OOT_socket_source_c.block.yml
     OFDM_OOT_test_block.block.yml
     OFDM_OOT_retrieve_vector_on_tag_cc.block.yml
-    OFDM_OOT_cfar_detector_cpp_ccc.block.yml DESTINATION share/gnuradio/grc/blocks
+    OFDM_OOT_ofdm_preamble_sync.block.yml
+    OFDM_OOT_cfar_detector.block.yml
+    OFDM_OOT_autocorr_cc.block.yml
+    OFDM_OOT_autocorr_cpp_cc.block.yml
+    OFDM_OOT_cfar_detector_cpp.block.yml DESTINATION share/gnuradio/grc/blocks
 )

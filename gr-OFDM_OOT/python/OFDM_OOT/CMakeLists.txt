@@ -31,7 +31,10 @@ GR_PYTHON_INSTALL(
     ofdm_source.py
     socket_source_c.py
     test_block.py
-    retrieve_vector_on_tag_cc.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
+    retrieve_vector_on_tag_cc.py
+    ofdm_preamble_sync.py
+    cfar_detector.py
+    autocorr_cc.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
 )
 
 ########################################################################
@@ -48,12 +51,9 @@ add_custom_target(
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}
           ${CMAKE_BINARY_DIR}/test_modules/gnuradio/OFDM_OOT/
 )
-GR_ADD_TEST(qa_ofdm_modulator_cpp_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_modulator_cpp_cc.py)
-GR_ADD_TEST(qa_ofdm_corr_sync_cpp_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_corr_sync_cpp_cc.py)
 GR_ADD_TEST(qa_ofdm_precise_sync_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_precise_sync_cc.py)
 GR_ADD_TEST(qa_ofdm_retreive_data_sym_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_retreive_data_sym_cc.py)
 GR_ADD_TEST(qa_ofdm_corr_sync_demultiplex_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_corr_sync_demultiplex_cc.py)
 GR_ADD_TEST(qa_BER_bbb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_BER_bbb.py)
-GR_ADD_TEST(qa_autocorr_cpp_cccc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_autocorr_cpp_cccc.py)
 GR_ADD_TEST(qa_ofdm_symbols_stitching ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_symbols_stitching.py)
 GR_ADD_TEST(qa_vector_concat ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_vector_concat.py)

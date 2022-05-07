@@ -11,10 +11,8 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 list(APPEND OFDM_OOT_sources
-    ofdm_modulator_cpp_cc_impl.cc
-    ofdm_corr_sync_cpp_cc_impl.cc
-    autocorr_cpp_cccc_impl.cc
-    cfar_detector_cpp_ccc_impl.cc )
+    autocorr_cpp_cc_impl.cc
+    cfar_detector_cpp_impl.cc )
 
 set(OFDM_OOT_sources "${OFDM_OOT_sources}" PARENT_SCOPE)
 if(NOT OFDM_OOT_sources)

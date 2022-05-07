@@ -11,8 +11,6 @@
 ########################################################################
 install(FILES
     api.h
-    ofdm_modulator_cpp_cc.h
-    ofdm_corr_sync_cpp_cc.h
-    autocorr_cpp_cccc.h
-    cfar_detector_cpp_ccc.h DESTINATION include/gnuradio/OFDM_OOT
+    autocorr_cpp_cc.h
+    cfar_detector_cpp.h DESTINATION include/gnuradio/OFDM_OOT
 )

@@ -1,0 +1,57 @@
+id: OFDM_OOT_ofdm_preamble_sync
+label: ofdm_preamble_sync
+category: '[OFDM_OOT]'
+
+templates:
+  imports: from gnuradio import OFDM_OOT
+  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt})
+
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
+parameters:
+- id: nfft
+  label: nfft
+  dtype: int
+  default: 64
+- id: nguard
+  label: nguard
+  dtype: int
+  default: 16
+- id: frame_sym_cnt
+  label: frame_sym_cnt
+  dtype: int
+  default: 1
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+- label: in
+  domain: stream
+  dtype: complex
+  vlen: ${(nfft+nguard) + (nfft+nguard)*frame_sym_cnt}
+  optional: false
+- label: corr_arg
+  domain: stream
+  dtype: complex
+  vlen: 1
+  optional: false
+
+outputs:
+- label: out
+  domain: stream
+  dtype: complex
+  vlen: ${nfft}
+  optional: false
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1
