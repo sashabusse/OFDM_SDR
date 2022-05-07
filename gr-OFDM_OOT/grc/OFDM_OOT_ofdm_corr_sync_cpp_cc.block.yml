@@ -4,7 +4,7 @@ category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.ofdm_corr_sync_cpp_cc(nfft=${nfft}, n_guard=${n_guard}, corr_sz=${corr_sz})
+  make: OFDM_OOT.ofdm_corr_sync_cpp_cc(nfft=${nfft}, n_guard=${n_guard}, corr_sz=${corr_sz}, sync_corr_lvl=${sync_corr_lvl})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -25,7 +25,10 @@ parameters:
   label: corr_sz
   dtype: int
   default: 64
-
+- id: sync_corr_lvl
+  label: corr lvl for detection
+  dtype: float
+  default: 0.8
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
 #      * label (an identifier for the GUI)

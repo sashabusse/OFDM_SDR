@@ -1,0 +1,70 @@
+id: OFDM_OOT_cfar_detector_cpp_ccc
+label: cfar_detector_cpp_ccc
+category: '[OFDM_OOT]'
+
+templates:
+  imports: from gnuradio import OFDM_OOT
+  make: OFDM_OOT.cfar_detector_cpp_ccc(${n_train}, ${n_gap}, ${p_false_alarm}, ${n_search_forward}, ${n_skip_after_detect})
+
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
+parameters:
+- id: n_train
+  label: n_train
+  dtype: int
+  default: 100
+- id: n_gap
+  label: n_gap
+  dtype: int
+  default: 10
+- id: p_false_alarm
+  label: p_false_alarm
+  dtype: float
+  default: 0.001
+- id: n_search_forward
+  label: n_search_forward
+  dtype: int
+  default: 0
+- id: n_skip_after_detect
+  label: n_skip_after_detect
+  dtype: int
+  default: 0
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+- label: in
+  domain: stream
+  dtype: complex
+  vlen: 1
+  optional: false
+- label: in_corr
+  domain: stream
+  dtype: complex
+  vlen: 1
+  optional: false
+
+outputs:
+- label: signal
+  domain: stream
+  dtype: complex
+  vlen: 1
+  optional: false
+- label: corr
+  domain: stream
+  dtype: complex
+  vlen: 1
+  optional: false
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1

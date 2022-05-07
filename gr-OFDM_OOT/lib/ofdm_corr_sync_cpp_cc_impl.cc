@@ -16,22 +16,27 @@ namespace gr {
 namespace OFDM_OOT {
 
 ofdm_corr_sync_cpp_cc::sptr
-ofdm_corr_sync_cpp_cc::make(int nfft, int n_guard, int corr_sz)
+ofdm_corr_sync_cpp_cc::make(int nfft, int n_guard, int corr_sz, float sync_corr_lvl)
 {
-    return gnuradio::make_block_sptr<ofdm_corr_sync_cpp_cc_impl>(nfft, n_guard, corr_sz);
+    return gnuradio::make_block_sptr<ofdm_corr_sync_cpp_cc_impl>(
+        nfft, n_guard, corr_sz, sync_corr_lvl);
 }
 
 
 /*
  * The private constructor
  */
-ofdm_corr_sync_cpp_cc_impl::ofdm_corr_sync_cpp_cc_impl(int nfft, int n_guard, int corr_sz)
+ofdm_corr_sync_cpp_cc_impl::ofdm_corr_sync_cpp_cc_impl(int nfft,
+                                                       int n_guard,
+                                                       int corr_sz,
+                                                       float sync_corr_lvl)
     : gr::block("ofdm_corr_sync_cpp_cc",
                 gr::io_signature::make(1, 1, sizeof(gr_complex)),
                 gr::io_signature::make(2, 2, sizeof(gr_complex))),
       nfft(nfft),
       n_guard(n_guard),
-      corr_sz(corr_sz)
+      corr_sz(corr_sz),
+      sync_corr_lvl(sync_corr_lvl)
 {
     // initialize buffer for correlation peak detection
     this->corr_buf.resize(2 * peak_len());
@@ -185,7 +190,7 @@ gr_complex ofdm_corr_sync_cpp_cc_impl::correlation(const gr_complex* in)
     volk_32fc_x2_conjugate_dot_prod_32fc(&s2s2, s2, s2, corr_sz);
 
     // normalize correlation
-    gr_complex norm = sqrt(s1s1 * s2s2);
+    float norm = sqrt(abs(s1s1) * abs(s2s2));
     if (std::abs(norm) == 0) {
         s1s2 = 0;
     } else {

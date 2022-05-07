@@ -14,7 +14,7 @@
 // BINDTOOL_GEN_AUTOMATIC(0)
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(ofdm_corr_sync_cpp_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(60a61f6cb19a3413e973ea4557bcb28b)                     */
+/* BINDTOOL_HEADER_FILE_HASH(92e387ada43ef360bdb2a87424060bf3)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -32,7 +32,6 @@ void bind_ofdm_corr_sync_cpp_cc(py::module& m)
 
     using ofdm_corr_sync_cpp_cc = gr::OFDM_OOT::ofdm_corr_sync_cpp_cc;
 
-
     py::class_<ofdm_corr_sync_cpp_cc,
                gr::block,
                gr::basic_block,
@@ -43,6 +42,7 @@ void bind_ofdm_corr_sync_cpp_cc(py::module& m)
              py::arg("nfft") = 1024,
              py::arg("n_guard") = 128,
              py::arg("corr_sz") = 64,
+             py::arg("sync_corr_lvl") = 0.8,
              D(ofdm_corr_sync_cpp_cc, make))
 
 

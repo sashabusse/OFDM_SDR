@@ -32,7 +32,8 @@ public:
      * class. OFDM_OOT::ofdm_corr_sync_cpp_cc::make is the public interface for
      * creating new instances.
      */
-    static sptr make(int nfft = 1024, int n_guard = 128, int corr_sz = 64);
+    static sptr
+    make(int nfft = 1024, int n_guard = 128, int corr_sz = 64, float sync_corr_lvl = 0.8);
 };
 
 } // namespace OFDM_OOT

@@ -48,7 +48,7 @@ private:
     int corr_delay = 0;
 
 public:
-    ofdm_corr_sync_cpp_cc_impl(int nfft, int n_guard, int corr_sz);
+    ofdm_corr_sync_cpp_cc_impl(int nfft, int n_guard, int corr_sz, float sync_corr_lvl);
     ~ofdm_corr_sync_cpp_cc_impl();
 
     // Where all the action really happens
