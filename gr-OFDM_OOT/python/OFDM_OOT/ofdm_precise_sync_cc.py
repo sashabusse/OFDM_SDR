@@ -9,6 +9,7 @@
 
 import numpy as np
 from gnuradio import gr
+import time
 
 class ofdm_precise_sync_cc(gr.basic_block):
     """
@@ -17,7 +18,7 @@ class ofdm_precise_sync_cc(gr.basic_block):
     @param nfft
     @param piot_carrier
     """
-    def __init__(self, nfft=64, pilot_groups_idx=[[]], pilot_groups_vals=[[]]):
+    def __init__(self, nfft=64, pilot_groups_idx=[[]], pilot_groups_vals=[[]], report_freq_off=False):
         gr.basic_block.__init__(self,
             name="ofdm_precise_sync_cc",
             in_sig=[(np.complex64, nfft), ],
@@ -28,6 +29,9 @@ class ofdm_precise_sync_cc(gr.basic_block):
         self.nfft = nfft
         self.pilot_groups_idx = pilot_groups_idx
         self.pilot_groups_vals = pilot_groups_vals
+
+        self.report_freq_off = report_freq_off
+        self.last_report_time = time.time()
 
     def forecast(self, noutput_items, ninputs):
         ninput_items_required = [noutput_items] * ninputs
@@ -57,6 +61,12 @@ class ofdm_precise_sync_cc(gr.basic_block):
             )
         
         phase_per_sample_avg = np.mean(group_phase_per_sample_avg)
+
+        if self.report_freq_off and time.time() - self.last_report_time > 0.5:
+            shift_est = phase_per_sample_avg*self.nfft/(2*np.pi)
+            print("precise sync : shift_est = {:.3f}".format(shift_est))
+            self.last_report_time = time.time()
+
         
         # eliminate phase increase
         # fftfreq to account that second part is actually negative frequency

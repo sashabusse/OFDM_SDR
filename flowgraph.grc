@@ -82,7 +82,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '1'
+    value: '10'
   states:
     bus_sink: false
     bus_source: false
@@ -392,11 +392,12 @@ blocks:
     minoutbuf: '0'
     nfft: nfft
     nguard: nguard
+    report_freq_off: 'True'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1352, 1316.0]
+    coordinate: [1352, 1308.0]
     rotation: 0
     state: enabled
 - name: OFDM_OOT_ofdm_precise_sync_cc_0
@@ -410,6 +411,7 @@ blocks:
     nfft: '1024'
     pilot_groups_idx: '[[]]'
     pilot_groups_vals: '[[]]'
+    report_freq_off: 'False'
   states:
     bus_sink: false
     bus_source: false
@@ -428,11 +430,12 @@ blocks:
     nfft: nfft
     pilot_groups_idx: '[pilot_carriers_idx_group_0, pilot_carriers_idx_group_1]'
     pilot_groups_vals: '[pilot_values_group_0, pilot_values_group_1]'
+    report_freq_off: 'True'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1632, 1316.0]
+    coordinate: [1624, 1308.0]
     rotation: 0
     state: enabled
 - name: OFDM_OOT_ofdm_retreive_data_sym_cc_0
@@ -579,7 +582,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1704, 1588.0]
+    coordinate: [1704, 1620.0]
     rotation: 0
     state: enabled
 - name: blocks_complex_to_mag_0
@@ -643,7 +646,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1704, 1540.0]
+    coordinate: [1704, 1508.0]
     rotation: 0
     state: enabled
 - name: blocks_divide_xx_0
@@ -682,6 +685,24 @@ blocks:
     coordinate: [3232, 748.0]
     rotation: 0
     state: disabled
+- name: blocks_keep_one_in_n_0
+  id: blocks_keep_one_in_n
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    n: frame_sym_cnt
+    type: complex
+    vlen: nfft
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1472, 1500.0]
+    rotation: 0
+    state: bypassed
 - name: blocks_message_debug_0
   id: blocks_message_debug
   parameters:
@@ -732,6 +753,24 @@ blocks:
     coordinate: [5016, 1212.0]
     rotation: 0
     state: disabled
+- name: blocks_multiply_const_vxx_2
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1048, 604.0]
+    rotation: 0
+    state: true
 - name: blocks_nlog10_ff_0
   id: blocks_nlog10_ff
   parameters:
@@ -1064,7 +1103,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1712, 1728.0]
+    coordinate: [1704, 1712.0]
     rotation: 0
     state: true
 - name: blocks_vector_to_stream_1_0
@@ -1494,7 +1533,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1928, 1716.0]
+    coordinate: [1928, 1700.0]
     rotation: 0
     state: true
 - name: qtgui_freq_sink_x_0
@@ -2161,7 +2200,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1032, 604.0]
+    coordinate: [1288, 604.0]
     rotation: 0
     state: true
 - name: virtual_sink_1
@@ -2182,12 +2221,12 @@ blocks:
   parameters:
     alias: ''
     comment: ''
-    stream_id: synchronized_ofdm_sym
+    stream_id: precise_sync_out
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1888, 1332.0]
+    coordinate: [1920, 1332.0]
     rotation: 0
     state: enabled
 - name: virtual_sink_2_0
@@ -2200,7 +2239,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1328, 1396.0]
+    coordinate: [1328, 1404.0]
     rotation: 180
     state: enabled
 - name: virtual_source_0
@@ -2234,27 +2273,14 @@ blocks:
   parameters:
     alias: ''
     comment: ''
-    stream_id: synchronized_ofdm_sym
+    stream_id: precise_sync_out
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1432, 1564.0]
+    coordinate: [1184, 1508.0]
     rotation: 0
     state: enabled
-- name: virtual_source_3
-  id: virtual_source
-  parameters:
-    alias: ''
-    comment: ''
-    stream_id: coarse_sync_out
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1448, 1620.0]
-    rotation: 0
-    state: disabled
 
 connections:
 - [OFDM_OOT_BER_bbb_0, '0', ber_est_lg, '0']
@@ -2284,8 +2310,12 @@ connections:
 - [blocks_complex_to_mag_1, '0', blocks_nlog10_ff_0, '0']
 - [blocks_complex_to_mag_1_0_0, '0', qtgui_vector_sink_f_1, '0']
 - [blocks_divide_xx_0, '0', blocks_nlog10_ff_1, '0']
+- [blocks_keep_one_in_n_0, '0', blocks_complex_to_arg_0, '0']
+- [blocks_keep_one_in_n_0, '0', blocks_complex_to_mag_1_0_0, '0']
+- [blocks_keep_one_in_n_0, '0', blocks_vector_to_stream_1, '0']
 - [blocks_multiply_const_vxx_0, '0', qtgui_vector_sink_f_0, '0']
 - [blocks_multiply_const_vxx_1, '0', snr_est, '0']
+- [blocks_multiply_const_vxx_2, '0', virtual_sink_0, '0']
 - [blocks_nlog10_ff_0, '0', blocks_multiply_const_vxx_0, '0']
 - [blocks_nlog10_ff_1, '0', blocks_multiply_const_vxx_1, '0']
 - [blocks_probe_rate_0, rate, blocks_message_debug_0, print]
@@ -2306,7 +2336,7 @@ connections:
 - [blocks_vector_to_stream_0_0_0, '0', blocks_sub_xx_0, '0']
 - [blocks_vector_to_stream_0_0_0, '0', digital_constellation_decoder_cb_0, '0']
 - [blocks_vector_to_stream_1, '0', qtgui_const_sink_x_1, '0']
-- [blocks_vector_to_stream_1_0, '0', virtual_sink_0, '0']
+- [blocks_vector_to_stream_1_0, '0', blocks_multiply_const_vxx_2, '0']
 - [channels_channel_model_0, '0', virtual_sink_1, '0']
 - [digital_constellation_decoder_cb_0, '0', blocks_repack_bits_bb_0, '0']
 - [digital_constellation_encoder_bc_0_0, '0', blocks_sub_xx_0, '1']
@@ -2316,11 +2346,7 @@ connections:
 - [virtual_source_0, '0', qtgui_time_sink_x_2, '0']
 - [virtual_source_1, '0', OFDM_OOT_autocorr_cpp_cc_0, '0']
 - [virtual_source_1, '0', qtgui_freq_sink_x_0, '0']
-- [virtual_source_2, '0', blocks_complex_to_arg_0, '0']
-- [virtual_source_2, '0', blocks_complex_to_mag_1_0_0, '0']
-- [virtual_source_2, '0', blocks_vector_to_stream_1, '0']
-- [virtual_source_3, '0', blocks_complex_to_arg_0, '0']
-- [virtual_source_3, '0', blocks_complex_to_mag_1_0_0, '0']
+- [virtual_source_2, '0', blocks_keep_one_in_n_0, '0']
 
 metadata:
   file_format: 1

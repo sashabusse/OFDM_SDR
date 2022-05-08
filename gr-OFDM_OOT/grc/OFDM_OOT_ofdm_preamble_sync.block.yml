@@ -4,7 +4,7 @@ category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt})
+  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt}, ${report_freq_off})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -25,6 +25,10 @@ parameters:
   label: frame_sym_cnt
   dtype: int
   default: 1
+- id: report_freq_off
+  label: report_freq_off
+  dtype: bool
+  default: False
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:

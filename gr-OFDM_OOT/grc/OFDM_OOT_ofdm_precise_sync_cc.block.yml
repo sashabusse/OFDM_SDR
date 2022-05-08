@@ -4,7 +4,7 @@ category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.ofdm_precise_sync_cc(nfft=${nfft}, pilot_groups_idx=${pilot_groups_idx}, pilot_groups_vals=${pilot_groups_vals})
+  make: OFDM_OOT.ofdm_precise_sync_cc(nfft=${nfft}, pilot_groups_idx=${pilot_groups_idx}, pilot_groups_vals=${pilot_groups_vals}, report_freq_off=${report_freq_off})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -23,6 +23,10 @@ parameters:
 - id: pilot_groups_vals
   label: pilot_groups_vals
   default: [[]]
+- id: report_freq_off
+  label: report_freq_off
+  dtype: bool
+  default: False
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:

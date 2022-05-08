@@ -15,7 +15,7 @@ class ofdm_preamble_sync(gr.basic_block):
     """
     produces frame synchronization with preamble or cp
     """
-    def __init__(self, nfft=64, nguard=16, frame_sym_cnt=1):
+    def __init__(self, nfft=64, nguard=16, frame_sym_cnt=1, report_freq_off=False):
         gr.basic_block.__init__(self,
             name="ofdm_preamble_sync",
             in_sig=[(np.complex64, (nfft+nguard) + (nfft+nguard)*frame_sym_cnt), np.complex64],
@@ -24,7 +24,8 @@ class ofdm_preamble_sync(gr.basic_block):
         self.nfft = nfft
         self.nguard = nguard
         self.frame_sym_cnt = frame_sym_cnt
-
+        
+        self.report_freq_off = report_freq_off
         self.last_report_time = time.time()
     
     def forecast(self, noutput_items, ninputs):
@@ -45,8 +46,8 @@ class ofdm_preamble_sync(gr.basic_block):
         for frame_idx in range(frames_to_process):
             freq_offset_est = in_corr_arg[frame_idx]/(2*np.pi)/(self.nfft/2)
 
-            if time.time() - self.last_report_time >= 0.5:
-                print('freq_off_est = {:.3f} (max allowed = {:.3f})'.format(freq_offset_est, 0.5*(1/32)))
+            if self.report_freq_off and time.time() - self.last_report_time > 0.5:
+                print('preamble_sync: freq_off_est = {:.5f} (max allowed = {:.5f})'.format(freq_offset_est, 0.5*(1/32)))
                 self.last_report_time = time.time()
 
             for ofdm_sym_idx in range(self.frame_sym_cnt):
