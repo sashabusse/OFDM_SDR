@@ -9,6 +9,7 @@
 
 import numpy as np
 from gnuradio import gr
+import time
 
 class ofdm_preamble_sync(gr.basic_block):
     """
@@ -23,6 +24,8 @@ class ofdm_preamble_sync(gr.basic_block):
         self.nfft = nfft
         self.nguard = nguard
         self.frame_sym_cnt = frame_sym_cnt
+
+        self.last_report_time = time.time()
     
     def forecast(self, noutput_items, ninputs):
         ninput_items_required = [(noutput_items + self.frame_sym_cnt - 1)//self.frame_sym_cnt] * ninputs
@@ -41,6 +44,10 @@ class ofdm_preamble_sync(gr.basic_block):
         
         for frame_idx in range(frames_to_process):
             freq_offset_est = in_corr_arg[frame_idx]/(2*np.pi)/(self.nfft/2)
+
+            if time.time() - self.last_report_time >= 0.5:
+                print('freq_off_est = {:.3f} (max allowed = {:.3f})'.format(freq_offset_est, 0.5*(1/32)))
+                self.last_report_time = time.time()
 
             for ofdm_sym_idx in range(self.frame_sym_cnt):
                 ofdm_sym_start_idx = preamble_sz + (self.nfft+self.nguard)*ofdm_sym_idx + self.nguard//2

@@ -17,10 +17,10 @@ class vector_concat(gr.sync_block):
     def __init__(self, v1_sz, v2_sz):
         gr.sync_block.__init__(self,
             name="vector_concat",
-            in_sig=[(np.complex64, v1_sz), ],
-            out_sig=[(np.complex64, v2_sz), ])
+            in_sig=[(np.complex64, v1_sz), (np.complex64, v2_sz)],
+            out_sig=[(np.complex64, v1_sz + v2_sz), ])
 
 
     def work(self, input_items, output_items):
-        output_items[0][:] = np.vstack(input_items)
+        output_items[0][:] = np.hstack(input_items)
         return len(output_items[0])

@@ -34,7 +34,10 @@ GR_PYTHON_INSTALL(
     retrieve_vector_on_tag_cc.py
     ofdm_preamble_sync.py
     cfar_detector.py
-    autocorr_cc.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
+    autocorr_cc.py
+    ofdm_frame_builder.py
+    ofdm_preambles.py
+    Utility.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
 )
 
 ########################################################################
