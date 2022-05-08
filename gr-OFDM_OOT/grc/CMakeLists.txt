@@ -8,9 +8,7 @@
 install(FILES
     OFDM_OOT_ofdm_precise_sync_cc.block.yml
     OFDM_OOT_ofdm_retreive_data_sym_cc.block.yml
-    OFDM_OOT_ofdm_corr_sync_demultiplex_cc.block.yml
     OFDM_OOT_BER_bbb.block.yml
-    OFDM_OOT_ofdm_symbols_stitching.block.yml
     OFDM_OOT_vector_concat.block.yml
     OFDM_OOT_ofdm_source.block.yml
     OFDM_OOT_socket_source_c.block.yml

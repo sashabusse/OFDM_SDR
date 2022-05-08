@@ -25,9 +25,9 @@ except ModuleNotFoundError:
 
 from .ofdm_precise_sync_cc import ofdm_precise_sync_cc
 from .ofdm_retreive_data_sym_cc import ofdm_retreive_data_sym_cc
-from .ofdm_corr_sync_demultiplex_cc import ofdm_corr_sync_demultiplex_cc
+
 from .BER_bbb import BER_bbb
-from .ofdm_symbols_stitching import ofdm_symbols_stitching
+
 from .vector_concat import vector_concat
 from .ofdm_source import ofdm_source
 from .socket_source_c import socket_source_c

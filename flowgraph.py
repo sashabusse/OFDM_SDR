@@ -88,14 +88,16 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.nfft = nfft = 64
         self.pilot_values = pilot_values = np.hstack([pilot_values_group_0, pilot_values_group_1])
         self.ofdm_sym_sz = ofdm_sym_sz = nfft+nguard
-        self.ofdm_preamble = ofdm_preamble = OFDM_OOT.cox_schmerzmittel()
+        self.ofdm_preamble = ofdm_preamble = OFDM_OOT.cox_schmerzmittel(nfft, nguard, np.hstack([np.arange(25), nfft - np.arange(1, 26)]))
         self.g_qpsk_constellation = g_qpsk_constellation = digital.constellation_qpsk().base()
         self.frame_sym_cnt = frame_sym_cnt = 1
         self.data_carriers_idx = data_carriers_idx = np.setdiff1d(np.hstack([np.arange(5, 25) , np.arange(-5, -25, -1)]), pilot_carriers_idx)
+        self.sync_autocorr_sz = sync_autocorr_sz = nfft//2 + nguard
         self.samp_rate = samp_rate = int(2e6)
         self.ofdm_sym = ofdm_sym = OFDM_OOT.random_ofdm_sym(nfft, data_carriers_idx, pilot_carriers_idx, pilot_values)
         self.g_constellation = g_constellation = g_qpsk_constellation
         self.frame_sz = frame_sz = ofdm_preamble.size + ofdm_sym_sz*frame_sym_cnt
+        self.frame_spacing = frame_spacing = 200
         self.carrier_freq = carrier_freq = int(1.980e9)
 
         ##################################################
@@ -109,7 +111,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         for c in range(0, 1):
             self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_vector_sink_f_2 = qtgui.vector_sink_f(
-            64,
+            nfft,
             0,
             1.0,
             "x-Axis",
@@ -147,7 +149,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self._qtgui_vector_sink_f_2_win = sip.wrapinstance(self.qtgui_vector_sink_f_2.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_vector_sink_f_2_win)
         self.qtgui_vector_sink_f_1 = qtgui.vector_sink_f(
-            64,
+            nfft,
             0,
             1.0,
             "x-Axis",
@@ -236,7 +238,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self._qtgui_time_sink_x_2_win = sip.wrapinstance(self.qtgui_time_sink_x_2.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_time_sink_x_2_win)
         self.qtgui_time_sink_x_0_0 = qtgui.time_sink_f(
-            (64+16)*10, #size
+            frame_sz*5, #size
             1, #samp_rate
             "prefix correlation", #name
             1, #number of inputs
@@ -288,7 +290,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
             window.WIN_BLACKMAN_hARRIS, #wintype
             carrier_freq, #fc
             samp_rate, #bw
-            "pluto source", #name
+            "rx stream spectrum", #name
             1,
             None # parent
         )
@@ -329,7 +331,48 @@ class flowgraph(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setRowStretch(r, 1)
         for c in range(0, 1):
             self.top_grid_layout.setColumnStretch(c, 1)
-        self.iio_pluto_source_0_0 = iio.fmcomms2_source_fc32('ip:192.168.3.1' if 'ip:192.168.3.1' else iio.get_pluto_uri(), [True, True], ((64+16)*2 + 200)*100)
+        self.qtgui_const_sink_x_1 = qtgui.const_sink_c(
+            nfft, #size
+            "", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_const_sink_x_1.set_update_time(0.10)
+        self.qtgui_const_sink_x_1.set_y_axis(-2, 2)
+        self.qtgui_const_sink_x_1.set_x_axis(-2, 2)
+        self.qtgui_const_sink_x_1.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
+        self.qtgui_const_sink_x_1.enable_autoscale(True)
+        self.qtgui_const_sink_x_1.enable_grid(True)
+        self.qtgui_const_sink_x_1.enable_axis_labels(True)
+
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ["blue", "red", "red", "red", "red",
+            "red", "red", "red", "red", "red"]
+        styles = [0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0]
+        markers = [0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0]
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_const_sink_x_1.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_const_sink_x_1.set_line_label(i, labels[i])
+            self.qtgui_const_sink_x_1.set_line_width(i, widths[i])
+            self.qtgui_const_sink_x_1.set_line_color(i, colors[i])
+            self.qtgui_const_sink_x_1.set_line_style(i, styles[i])
+            self.qtgui_const_sink_x_1.set_line_marker(i, markers[i])
+            self.qtgui_const_sink_x_1.set_line_alpha(i, alphas[i])
+
+        self._qtgui_const_sink_x_1_win = sip.wrapinstance(self.qtgui_const_sink_x_1.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_const_sink_x_1_win)
+        self.iio_pluto_source_0_0 = iio.fmcomms2_source_fc32('ip:192.168.3.1' if 'ip:192.168.3.1' else iio.get_pluto_uri(), [True, True], (frame_sz+frame_spacing)*100)
         self.iio_pluto_source_0_0.set_len_tag_key('packet_len')
         self.iio_pluto_source_0_0.set_frequency(carrier_freq)
         self.iio_pluto_source_0_0.set_samplerate(1*samp_rate)
@@ -339,7 +382,7 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.iio_pluto_source_0_0.set_rfdc(True)
         self.iio_pluto_source_0_0.set_bbdc(True)
         self.iio_pluto_source_0_0.set_filter_params('Auto', '', 0, 0)
-        self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('ip:192.168.2.1' if 'ip:192.168.2.1' else iio.get_pluto_uri(), [True, True], ((64+16)*2 + 200)*100, False)
+        self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('ip:192.168.2.1' if 'ip:192.168.2.1' else iio.get_pluto_uri(), [True, True], (frame_sz+frame_spacing)*100, False)
         self.iio_pluto_sink_0.set_len_tag_key('')
         self.iio_pluto_sink_0.set_bandwidth(int(samp_rate))
         self.iio_pluto_sink_0.set_frequency(carrier_freq)
@@ -347,18 +390,19 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.iio_pluto_sink_0.set_attenuation(0, 10)
         self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
         self.blocks_vector_to_stream_1_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, frame_sz+200)
-        self.blocks_vector_source_x_1 = blocks.vector_source_c(np.zeros(200), True, 200, [])
+        self.blocks_vector_to_stream_1 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, nfft)
+        self.blocks_vector_source_x_1 = blocks.vector_source_c(np.zeros(frame_spacing), True, frame_spacing, [])
         self.blocks_vector_source_x_0 = blocks.vector_source_c(ofdm_sym, True, nfft, [])
-        self.blocks_complex_to_mag_1_0_0 = blocks.complex_to_mag(64)
+        self.blocks_complex_to_mag_1_0_0 = blocks.complex_to_mag(nfft)
         self.blocks_complex_to_mag_0_0 = blocks.complex_to_mag(1)
-        self.blocks_complex_to_arg_0 = blocks.complex_to_arg(64)
-        self.OFDM_OOT_vector_concat_0 = OFDM_OOT.vector_concat(frame_sz, 200)
-        self.OFDM_OOT_retrieve_vector_on_tag_cc_0 = OFDM_OOT.retrieve_vector_on_tag_cc('cfar', ((64+16) + (64+16)*1))
+        self.blocks_complex_to_arg_0 = blocks.complex_to_arg(nfft)
+        self.OFDM_OOT_vector_concat_0 = OFDM_OOT.vector_concat(frame_sz, frame_spacing)
+        self.OFDM_OOT_retrieve_vector_on_tag_cc_0 = OFDM_OOT.retrieve_vector_on_tag_cc('cfar', frame_sz)
         self.OFDM_OOT_ofdm_precise_sync_cc_1 = OFDM_OOT.ofdm_precise_sync_cc(nfft=nfft, pilot_groups_idx=[pilot_carriers_idx_group_0, pilot_carriers_idx_group_1], pilot_groups_vals=[pilot_values_group_0, pilot_values_group_1])
-        self.OFDM_OOT_ofdm_preamble_sync_0 = OFDM_OOT.ofdm_preamble_sync(64, 16, 1)
+        self.OFDM_OOT_ofdm_preamble_sync_0 = OFDM_OOT.ofdm_preamble_sync(nfft, nguard, frame_sym_cnt)
         self.OFDM_OOT_ofdm_frame_builder_0 = OFDM_OOT.ofdm_frame_builder(nfft, nguard, frame_sym_cnt, ofdm_preamble)
-        self.OFDM_OOT_cfar_detector_cpp_0 = OFDM_OOT.cfar_detector_cpp([ -32-16+1 - 64, -32-16+1], 0.0001, 32+16, (64+16)*2)
-        self.OFDM_OOT_autocorr_cpp_cc_0 = OFDM_OOT.autocorr_cpp_cc(48, 32, False, False)
+        self.OFDM_OOT_cfar_detector_cpp_0 = OFDM_OOT.cfar_detector_cpp([ -sync_autocorr_sz+1 - nfft, -(sync_autocorr_sz)+1], 1e-10, sync_autocorr_sz, frame_sz)
+        self.OFDM_OOT_autocorr_cpp_cc_0 = OFDM_OOT.autocorr_cpp_cc(sync_autocorr_sz, nfft//2, False, False)
 
 
         ##################################################
@@ -372,14 +416,16 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.connect((self.OFDM_OOT_ofdm_preamble_sync_0, 0), (self.OFDM_OOT_ofdm_precise_sync_cc_1, 0))
         self.connect((self.OFDM_OOT_ofdm_precise_sync_cc_1, 0), (self.blocks_complex_to_arg_0, 0))
         self.connect((self.OFDM_OOT_ofdm_precise_sync_cc_1, 0), (self.blocks_complex_to_mag_1_0_0, 0))
-        self.connect((self.OFDM_OOT_retrieve_vector_on_tag_cc_0, 1), (self.OFDM_OOT_ofdm_preamble_sync_0, 1))
+        self.connect((self.OFDM_OOT_ofdm_precise_sync_cc_1, 0), (self.blocks_vector_to_stream_1, 0))
         self.connect((self.OFDM_OOT_retrieve_vector_on_tag_cc_0, 0), (self.OFDM_OOT_ofdm_preamble_sync_0, 0))
+        self.connect((self.OFDM_OOT_retrieve_vector_on_tag_cc_0, 1), (self.OFDM_OOT_ofdm_preamble_sync_0, 1))
         self.connect((self.OFDM_OOT_vector_concat_0, 0), (self.blocks_vector_to_stream_1_0, 0))
         self.connect((self.blocks_complex_to_arg_0, 0), (self.qtgui_vector_sink_f_2, 0))
         self.connect((self.blocks_complex_to_mag_0_0, 0), (self.qtgui_time_sink_x_0_0, 0))
         self.connect((self.blocks_complex_to_mag_1_0_0, 0), (self.qtgui_vector_sink_f_1, 0))
         self.connect((self.blocks_vector_source_x_0, 0), (self.OFDM_OOT_ofdm_frame_builder_0, 0))
         self.connect((self.blocks_vector_source_x_1, 0), (self.OFDM_OOT_vector_concat_0, 1))
+        self.connect((self.blocks_vector_to_stream_1, 0), (self.qtgui_const_sink_x_1, 0))
         self.connect((self.blocks_vector_to_stream_1_0, 0), (self.iio_pluto_sink_0, 0))
         self.connect((self.blocks_vector_to_stream_1_0, 0), (self.qtgui_time_sink_x_2, 0))
         self.connect((self.iio_pluto_source_0_0, 0), (self.OFDM_OOT_autocorr_cpp_cc_0, 0))
@@ -435,15 +481,19 @@ class flowgraph(gr.top_block, Qt.QWidget):
 
     def set_nguard(self, nguard):
         self.nguard = nguard
+        self.set_ofdm_preamble(OFDM_OOT.cox_schmerzmittel(self.nfft, self.nguard, np.hstack([np.arange(25), self.nfft - np.arange(1, 26)])))
         self.set_ofdm_sym_sz(self.nfft+self.nguard)
+        self.set_sync_autocorr_sz(self.nfft//2 + self.nguard)
 
     def get_nfft(self):
         return self.nfft
 
     def set_nfft(self, nfft):
         self.nfft = nfft
+        self.set_ofdm_preamble(OFDM_OOT.cox_schmerzmittel(self.nfft, self.nguard, np.hstack([np.arange(25), self.nfft - np.arange(1, 26)])))
         self.set_ofdm_sym(OFDM_OOT.random_ofdm_sym(self.nfft, self.data_carriers_idx, self.pilot_carriers_idx, self.pilot_values))
         self.set_ofdm_sym_sz(self.nfft+self.nguard)
+        self.set_sync_autocorr_sz(self.nfft//2 + self.nguard)
 
     def get_pilot_values(self):
         return self.pilot_values
@@ -486,6 +536,12 @@ class flowgraph(gr.top_block, Qt.QWidget):
         self.data_carriers_idx = data_carriers_idx
         self.set_ofdm_sym(OFDM_OOT.random_ofdm_sym(self.nfft, self.data_carriers_idx, self.pilot_carriers_idx, self.pilot_values))
 
+    def get_sync_autocorr_sz(self):
+        return self.sync_autocorr_sz
+
+    def set_sync_autocorr_sz(self, sync_autocorr_sz):
+        self.sync_autocorr_sz = sync_autocorr_sz
+
     def get_samp_rate(self):
         return self.samp_rate
 
@@ -514,6 +570,13 @@ class flowgraph(gr.top_block, Qt.QWidget):
 
     def set_frame_sz(self, frame_sz):
         self.frame_sz = frame_sz
+
+    def get_frame_spacing(self):
+        return self.frame_spacing
+
+    def set_frame_spacing(self, frame_spacing):
+        self.frame_spacing = frame_spacing
+        self.blocks_vector_source_x_1.set_data(np.zeros(self.frame_spacing), [])
 
     def get_carrier_freq(self):
         return self.carrier_freq

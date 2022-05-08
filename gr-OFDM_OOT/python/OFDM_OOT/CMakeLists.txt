@@ -24,9 +24,7 @@ GR_PYTHON_INSTALL(
     __init__.py
     ofdm_precise_sync_cc.py
     ofdm_retreive_data_sym_cc.py
-    ofdm_corr_sync_demultiplex_cc.py
     BER_bbb.py
-    ofdm_symbols_stitching.py
     vector_concat.py
     ofdm_source.py
     socket_source_c.py
@@ -56,7 +54,5 @@ add_custom_target(
 )
 GR_ADD_TEST(qa_ofdm_precise_sync_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_precise_sync_cc.py)
 GR_ADD_TEST(qa_ofdm_retreive_data_sym_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_retreive_data_sym_cc.py)
-GR_ADD_TEST(qa_ofdm_corr_sync_demultiplex_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_corr_sync_demultiplex_cc.py)
 GR_ADD_TEST(qa_BER_bbb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_BER_bbb.py)
-GR_ADD_TEST(qa_ofdm_symbols_stitching ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_symbols_stitching.py)
 GR_ADD_TEST(qa_vector_concat ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_vector_concat.py)
