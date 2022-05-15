@@ -4,11 +4,11 @@ category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt}, ${report_freq_off})
+  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt}, ${preamble_est_cfg}, ${use_cp_average_freq_off}, ${report_freq_off})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
-#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * id (makes the value accessible as keyname, e.g. in the make entry)s
 #     * label (label shown in the GUI)
 #     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
 #     * default
@@ -25,10 +25,18 @@ parameters:
   label: frame_sym_cnt
   dtype: int
   default: 1
+- id: preamble_est_cfg
+  label: preamble_est_cfg
+  default: OFDM_OOT.ofdm_preambles.cox_schmerzmittel_cfg(${nfft}, ${nguard})
+- id: use_cp_average_freq_off
+  label: use_cp_average_freq_off
+  dtype: bool
+  default: False
 - id: report_freq_off
   label: report_freq_off
   dtype: bool
   default: False
+  
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -41,7 +49,7 @@ inputs:
 - label: in
   domain: stream
   dtype: complex
-  vlen: ${(nfft+nguard) + (nfft+nguard)*frame_sym_cnt}
+  vlen: ${preamble_est_cfg['sz'] + (nfft+nguard)*frame_sym_cnt}
   optional: false
 - label: corr_arg
   domain: stream

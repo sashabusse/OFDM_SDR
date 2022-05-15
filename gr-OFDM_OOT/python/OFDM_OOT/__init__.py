@@ -29,8 +29,8 @@ from .ofdm_retreive_data_sym_cc import ofdm_retreive_data_sym_cc
 from .BER_bbb import BER_bbb
 
 from .vector_concat import vector_concat
-from .ofdm_source import ofdm_source
-from .socket_source_c import socket_source_c
+
+
 from .test_block import test_block
 from .retrieve_vector_on_tag_cc import retrieve_vector_on_tag_cc
 from .ofdm_preamble_sync import ofdm_preamble_sync
@@ -39,6 +39,7 @@ from .autocorr_cc import autocorr_cc
 from .ofdm_frame_builder import ofdm_frame_builder
 from .ofdm_preambles import *
 from .Utility import *
+from .ofdm_sco_sync import *
 
 
 #

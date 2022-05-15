@@ -10,8 +10,6 @@ install(FILES
     OFDM_OOT_ofdm_retreive_data_sym_cc.block.yml
     OFDM_OOT_BER_bbb.block.yml
     OFDM_OOT_vector_concat.block.yml
-    OFDM_OOT_ofdm_source.block.yml
-    OFDM_OOT_socket_source_c.block.yml
     OFDM_OOT_test_block.block.yml
     OFDM_OOT_retrieve_vector_on_tag_cc.block.yml
     OFDM_OOT_ofdm_preamble_sync.block.yml
