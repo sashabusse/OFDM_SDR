@@ -15,13 +15,14 @@ class retrieve_vector_on_tag_cc(gr.basic_block):
     """
     docstring for block retrieve_vector_on_tag_cc
     """
-    def __init__(self, tag='tag', vlen=1 ):
+    def __init__(self, tag='tag', vlen=1, extended_zeros=0):
+        self.vlen = vlen
+        self.tag = tag
+        self.extended_zeros = extended_zeros
         gr.basic_block.__init__(self,
             name="retrieve_vector_on_tag_cc",
             in_sig=[np.complex64, ],
-            out_sig=[(np.complex64, vlen), np.complex64])
-        self.vlen = vlen
-        self.tag = tag
+            out_sig=[(np.complex64, self.extended_zeros + self.vlen), np.complex64])
 
     def forecast(self, noutput_items, ninputs):
         ninput_items_required = [noutput_items*self.vlen] * ninputs
@@ -44,7 +45,8 @@ class retrieve_vector_on_tag_cc(gr.basic_block):
             vec = np.array(input_items[0][tag_rel_offset:tag_rel_offset + self.vlen], 
                             dtype=np.complex64)
 
-            output_items[0][items_processed] = vec
+            output_items[0][items_processed][:self.vlen] = vec
+            output_items[0][items_processed][self.vlen:] = 0
             output_items[1][items_processed] = pmt.to_python(tag.value)
 
             items_processed += 1

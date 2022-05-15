@@ -24,7 +24,8 @@ class ofdm_preamble_sync(gr.basic_block):
         frame_sym_cnt=1, 
         preamble_est_cfg=None,
         use_cp_average_freq_off=False,
-        report_freq_off=False 
+        report_freq_off=False,
+        in_sz=0
         ):
 
         self.nfft = nfft
@@ -42,10 +43,12 @@ class ofdm_preamble_sync(gr.basic_block):
         self.use_cp_average_freq_off = use_cp_average_freq_off
 
         self.frame_sz = self.preamble_est_cfg['sz'] + (nfft+nguard)*frame_sym_cnt
+        self.in_sz = in_sz
+        assert in_sz != 0
 
         gr.basic_block.__init__(self,
             name="ofdm_preamble_sync",
-            in_sig=[(np.complex64, self.frame_sz), np.complex64],
+            in_sig=[(np.complex64, self.in_sz), np.complex64],
             out_sig=[(np.complex64, nfft), ])
         
     
@@ -76,16 +79,16 @@ class ofdm_preamble_sync(gr.basic_block):
                 self.last_report_time = time.time()
 
             # compensate freq
-            in_frame[frame_idx] *= np.exp(-2j*np.pi*freq_offset_est*np.arange(self.frame_sz))
+            in_frame[frame_idx] *= np.exp(-2j*np.pi*freq_offset_est*np.arange(in_frame[frame_idx].size))
             
             # calculate residual freq offset in range (-0.5, 0.5)bin if desirable
             if self.use_cp_average_freq_off:
                 freq_offset_est = OFDM_OOT.ofdm_preambles.cp_average_est(
-                    in_frame[frame_idx][preamble_sz:], 
+                    in_frame[frame_idx][preamble_sz:preamble_sz+self.frame_sz], 
                     self.nfft, self.nguard, self.frame_sym_cnt
                 )
                 # compensate
-                in_frame[frame_idx] *= np.exp(-2j*np.pi*freq_offset_est*np.arange(self.frame_sz))
+                in_frame[frame_idx] *= np.exp(-2j*np.pi*freq_offset_est*np.arange(in_frame[frame_idx].size))
 
 
             for ofdm_sym_idx in range(self.frame_sym_cnt):

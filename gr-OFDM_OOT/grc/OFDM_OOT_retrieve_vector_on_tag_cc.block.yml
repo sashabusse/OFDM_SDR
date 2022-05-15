@@ -4,7 +4,7 @@ category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.retrieve_vector_on_tag_cc(${tag}, ${vlen})
+  make: OFDM_OOT.retrieve_vector_on_tag_cc(${tag}, ${vlen}, ${extended_zeros})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -21,6 +21,10 @@ parameters:
   label: vlen
   dtype: int
   default: 2
+- id: extended_zeros
+  label: extended_zeros
+  dtype: int
+  default: 0
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
 #  Keys include:
@@ -40,7 +44,7 @@ outputs:
 - label: data
   domain: stream
   dtype: complex
-  vlen: ${vlen}
+  vlen: ${extended_zeros + vlen}
   optional: false
 - label: tag_val
   domain: stream

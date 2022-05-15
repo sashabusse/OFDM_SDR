@@ -23,3 +23,6 @@ def random_ofdm_sym(nfft, data_carriers_idx, pilot_carriers_idx, pilot_values, d
     sym[pilot_carriers_idx] = pilot_values
     return sym
 
+
+def nearest_good_size(size, granularity=4096):
+    return int(np.ceil(size/granularity)*granularity)

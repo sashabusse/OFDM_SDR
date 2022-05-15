@@ -4,7 +4,7 @@ category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt}, ${preamble_est_cfg}, ${use_cp_average_freq_off}, ${report_freq_off})
+  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt}, ${preamble_est_cfg}, ${use_cp_average_freq_off}, ${report_freq_off}, ${in_vlen})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -36,6 +36,9 @@ parameters:
   label: report_freq_off
   dtype: bool
   default: False
+- id: in_vlen
+  label: in_vlen
+  dtype: int
   
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
@@ -49,7 +52,7 @@ inputs:
 - label: in
   domain: stream
   dtype: complex
-  vlen: ${preamble_est_cfg['sz'] + (nfft+nguard)*frame_sym_cnt}
+  vlen: ${in_vlen}
   optional: false
 - label: corr_arg
   domain: stream

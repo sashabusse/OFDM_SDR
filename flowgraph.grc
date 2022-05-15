@@ -130,7 +130,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '200'
+    value: (nfft+nguard)*2
   states:
     bus_sink: false
     bus_source: false
@@ -142,7 +142,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '30'
+    value: '3'
   states:
     bus_sink: false
     bus_source: false
@@ -166,19 +166,19 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '64'
+    value: '1024'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [832, 4.0]
+    coordinate: [800, 4.0]
     rotation: 0
     state: enabled
 - name: nguard
   id: variable
   parameters:
     comment: ''
-    value: '16'
+    value: '64'
   states:
     bus_sink: false
     bus_source: false
@@ -232,7 +232,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [832, 68.0]
+    coordinate: [800, 68.0]
     rotation: 0
     state: true
 - name: pilot_carriers_idx
@@ -372,7 +372,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '2'
+    value: '8'
   states:
     bus_sink: false
     bus_source: false
@@ -522,6 +522,7 @@ blocks:
     alias: ''
     comment: ''
     frame_sym_cnt: frame_sym_cnt
+    in_vlen: frame_sz
     maxoutbuf: '0'
     minoutbuf: '0'
     nfft: nfft
@@ -533,7 +534,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1392, 1780.0]
+    coordinate: [1392, 1772.0]
     rotation: 0
     state: enabled
 - name: OFDM_OOT_ofdm_precise_sync_cc_1
@@ -561,6 +562,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
+    extended_zeros: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
     tag: cfar
@@ -569,7 +571,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1040, 1808.0]
+    coordinate: [1040, 1804.0]
     rotation: 0
     state: enabled
 - name: OFDM_OOT_vector_concat_0
@@ -787,7 +789,7 @@ blocks:
     bus_structure: null
     coordinate: [1392, 1644.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: blocks_file_sink_0_0
   id: blocks_file_sink
   parameters:
@@ -1074,7 +1076,7 @@ blocks:
     bus_structure: null
     coordinate: [424, 1044.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_vector_source_x_0
   id: blocks_vector_source_x
   parameters:
@@ -1199,7 +1201,7 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    num_items: frame_sz+200
+    num_items: frame_sz+frame_spacing
     type: complex
     vlen: '1'
   states:
@@ -1229,7 +1231,7 @@ blocks:
     bus_structure: null
     coordinate: [664, 1004.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: digital_constellation_decoder_cb_0
   id: digital_constellation_decoder_cb
   parameters:
@@ -1287,7 +1289,7 @@ blocks:
     bus_structure: null
     coordinate: [432, 820.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: iio_pluto_source_0_0
   id: iio_pluto_source
   parameters:
@@ -1318,7 +1320,7 @@ blocks:
     bus_structure: null
     coordinate: [664, 796.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: import_0
   id: import
   parameters:
