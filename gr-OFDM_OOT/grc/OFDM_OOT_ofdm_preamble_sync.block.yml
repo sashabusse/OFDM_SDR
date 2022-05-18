@@ -4,7 +4,7 @@ category: '[OFDM_OOT]'
 
 templates:
   imports: from gnuradio import OFDM_OOT
-  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt}, ${preamble_est_cfg}, ${use_cp_average_freq_off}, ${report_freq_off}, ${in_vlen})
+  make: OFDM_OOT.ofdm_preamble_sync(${nfft}, ${nguard}, ${frame_sym_cnt}, ${compensate_cfo}, ${cfo_est_cfg}, ${use_cfo_cp_avg_est}, ${compensate_sco}, ${sco_interp_order}, ${pilot_idx}, ${in_sz}, ${debug_report})
 
 #  Make one 'parameters' list entry for every parameter you want settable from the GUI.
 #     Keys include:
@@ -25,20 +25,39 @@ parameters:
   label: frame_sym_cnt
   dtype: int
   default: 1
-- id: preamble_est_cfg
-  label: preamble_est_cfg
+
+- id: compensate_cfo
+  label: compensate_cfo
+  dtype: bool
+  default: True
+- id: cfo_est_cfg
+  label: cfo_est_cfg
   default: OFDM_OOT.ofdm_preambles.cox_schmerzmittel_cfg(${nfft}, ${nguard})
-- id: use_cp_average_freq_off
-  label: use_cp_average_freq_off
+- id: use_cfo_cp_avg_est
+  label: use_cfo_cp_avg_est
   dtype: bool
   default: False
-- id: report_freq_off
-  label: report_freq_off
+
+- id: compensate_sco
+  label: compensate_sco
   dtype: bool
   default: False
-- id: in_vlen
-  label: in_vlen
+- id: sco_interp_order
+  label: sco_interp_order
   dtype: int
+  default: 3
+- id: pilot_idx
+  label: pilot_idx
+  dtype: int_vector
+  default: np.zeros((0, ), dtype=int)
+
+- id: in_sz
+  label: in_sz
+  dtype: int
+- id: debug_report
+  label: debug_report
+  dtype: bool
+  default: True
   
 
 #  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
@@ -52,12 +71,7 @@ inputs:
 - label: in
   domain: stream
   dtype: complex
-  vlen: ${in_vlen}
-  optional: false
-- label: corr_arg
-  domain: stream
-  dtype: complex
-  vlen: 1
+  vlen: ${in_sz}
   optional: false
 
 outputs:

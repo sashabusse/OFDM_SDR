@@ -34,15 +34,15 @@ def cox_schmerzmittel_estimate(preamble_rx_sym, nfft=64, nguard=16):
     part2 = preamble_rx_sym[nguard//2+nfft//2:nguard//2+nfft]
 
     corr = part1.conj()@part2
-    freq_off_est = np.angle(corr)/(2*np.pi)/(nfft//2)
-    return freq_off_est
+    cfo_est = np.angle(corr)/(2*np.pi)/(nfft//2)
+    return cfo_est
 
 
 def cox_schmerzmittel_cfg(nfft=64, nguard=16):
     return {
         'sz': nfft+nguard,
-        'freq_off_est_func': cox_schmerzmittel_estimate,
-        'freq_off_est_args': (nfft, nguard)
+        'cfo_est_func': cox_schmerzmittel_estimate,
+        'cfo_est_args': (nfft, nguard)
     }    
 
 
@@ -66,29 +66,29 @@ def repeat_seqN(seq_len=32, N=4, f_border=0.35, seed=1349):
 def repeat_seqN_estimate(preamble_rx, seq_len=32, N=4):
     assert preamble_rx.size == seq_len*N, 'bad arguments'
     corr = preamble_rx[:seq_len*(N-1)].conj() @ preamble_rx[seq_len:]
-    freq_off_est = np.angle(corr)/(2*np.pi)/seq_len
-    return freq_off_est
+    cfo_est = np.angle(corr)/(2*np.pi)/seq_len
+    return cfo_est
 
 
 def repeat_seqN_cfg(seq_len=32, N=4):
     return {
         'sz': seq_len*N,
-        'freq_off_est_func': repeat_seqN_estimate,
-        'freq_off_est_args': (seq_len, N)
+        'cfo_est_func': repeat_seqN_estimate,
+        'cfo_est_args': (seq_len, N)
     }   
 
 
 def cp_average_est(frame_symbols_t, nfft, nguard, frame_sym_cnt, margin=1):
-    freq_off_est_avg = 0
+    cfo_est_avg = 0
     for sym_idx in range(frame_sym_cnt):
         sym_st = sym_idx*(nfft+nguard)
         p1 = frame_symbols_t[sym_st + margin: sym_st + nguard - margin]
         p2 = frame_symbols_t[sym_st + nfft + margin: sym_st + nfft + nguard - margin]
         corr = p1.conj() @ p2
-        freq_off_est = np.angle(corr)/(2*np.pi)/nfft
+        cfo_est = np.angle(corr)/(2*np.pi)/nfft
 
-        freq_off_est_avg += freq_off_est/frame_sym_cnt
+        cfo_est_avg += cfo_est/frame_sym_cnt
     
-    return freq_off_est_avg
+    return cfo_est_avg
 
     
