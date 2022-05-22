@@ -1,0 +1,52 @@
+id: OFDM_OOT_vector_retrive_by_idx_cc
+label: vector_retrive_by_idx_cc
+category: '[OFDM_OOT]'
+
+templates:
+  imports: from gnuradio import OFDM_OOT
+  make: OFDM_OOT.vector_retrive_by_idx_cc(${vlen_in}, ${vlen_out}, ${data_idx})
+
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#     * default
+parameters:
+- id: vlen_in
+  label: vlen_in
+  dtype: int
+  default: 1
+- id: vlen_out
+  label: vlen_out
+  dtype: int
+  default: 1
+- id: data_idx
+  label: data_idx
+  dtype: int_vector
+  default: []
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+- label: in
+  domain: stream
+  dtype: complex
+  vlen: ${vlen_in}
+  optional: false
+
+outputs:
+- label: out
+  domain: stream
+  dtype: complex
+  vlen: ${vlen_out}
+  optional: false
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1

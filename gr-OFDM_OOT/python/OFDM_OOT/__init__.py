@@ -40,6 +40,9 @@ from .ofdm_frame_builder import ofdm_frame_builder
 from .ofdm_preambles import *
 from .Utility import *
 from .ofdm_sco_sync import *
+from .vector_assign_cc import vector_assign_cc
+from .vector_build_by_idx_cc import vector_build_by_idx_cc
+from .vector_retrive_by_idx_cc import vector_retrive_by_idx_cc
 
 
 #

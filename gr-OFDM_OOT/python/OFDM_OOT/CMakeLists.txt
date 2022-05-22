@@ -34,7 +34,10 @@ GR_PYTHON_INSTALL(
     ofdm_frame_builder.py
     ofdm_preambles.py
     Utility.py
-    ofdm_sco_sync.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
+    ofdm_sco_sync.py
+    vector_assign_cc.py
+    vector_build_by_idx_cc.py
+    vector_retrive_by_idx_cc.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OFDM_OOT
 )
 
 ########################################################################

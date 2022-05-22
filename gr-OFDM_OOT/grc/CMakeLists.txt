@@ -17,5 +17,8 @@ install(FILES
     OFDM_OOT_autocorr_cc.block.yml
     OFDM_OOT_autocorr_cpp_cc.block.yml
     OFDM_OOT_cfar_detector_cpp.block.yml
-    OFDM_OOT_ofdm_frame_builder.block.yml DESTINATION share/gnuradio/grc/blocks
+    OFDM_OOT_ofdm_frame_builder.block.yml
+    OFDM_OOT_vector_assign_cc.block.yml
+    OFDM_OOT_vector_build_by_idx_cc.block.yml
+    OFDM_OOT_vector_retrive_by_idx_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )
