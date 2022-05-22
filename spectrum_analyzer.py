@@ -78,12 +78,12 @@ class spectrum_analyzer(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = int(20e6)
-        self.lo_freq = lo_freq = int(2e9)
+        self.lo_freq = lo_freq = int(1.990e9)
 
         ##################################################
         # Blocks
         ##################################################
-        self._lo_freq_range = Range(int(1.8e9), int(2.1e9), int(0.01e9), int(2e9), 200)
+        self._lo_freq_range = Range(int(0.4e9), int(2.1e9), int(0.01e9), int(1.990e9), 200)
         self._lo_freq_win = RangeWidget(self._lo_freq_range, self.set_lo_freq, "lo frequency", "counter_slider", float, QtCore.Qt.Horizontal)
         self.top_layout.addWidget(self._lo_freq_win)
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(

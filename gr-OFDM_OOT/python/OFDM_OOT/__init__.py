@@ -43,6 +43,8 @@ from .ofdm_sco_sync import *
 from .vector_assign_cc import vector_assign_cc
 from .vector_build_by_idx_cc import vector_build_by_idx_cc
 from .vector_retrive_by_idx_cc import vector_retrive_by_idx_cc
+from .channel_est import channel_est
+from .channel_est_hr import channel_est_hr
 
 
 #
